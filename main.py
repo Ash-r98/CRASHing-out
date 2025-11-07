@@ -37,5 +37,3 @@ while run:
     pygame.display.update()
 
 pygame.quit()
-
-#Hello
