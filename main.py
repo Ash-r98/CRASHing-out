@@ -27,6 +27,8 @@ while run:
 
     if state == 0:
         pass
+    else:
+        state = 0
 
     for event in pygame.event.get():
         # If windows X button is used
