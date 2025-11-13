@@ -1,2 +1,5 @@
 width=960
 height=540
+volume=1
+difficulty=1
+autosynchighscore=1

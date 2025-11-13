@@ -8,8 +8,10 @@ pygame.display.set_caption('CRASHing out')
 # Backup variables
 width = None
 height = None
+volume = None
 backupwidth = 960
 backupheight = 540
+backupvolume = 1
 
 # Settings
 with open("settings.txt") as settings:
@@ -26,12 +28,21 @@ with open("settings.txt") as settings:
                 height = int(line[1])
             except:
                 height = backupheight
+        elif line[0] == "volume":
+            try:
+                volume = int(line[1])
+            except:
+                volume = backupvolume
 
-# Screen
 if width == None:
     width = backupwidth
 if height == None:
-    height == backupheight
+    height = backupheight
+if volume == None:
+    volume = backupheight
+
+
+# Screen
 
 SCREEN_WIDTH = width
 SCREEN_HEIGHT = height
