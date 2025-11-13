@@ -33,8 +33,6 @@ if width == None:
 if height == None:
     height == backupheight
 
-print(width, height)
-
 SCREEN_WIDTH = width
 SCREEN_HEIGHT = height
 
