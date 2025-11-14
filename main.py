@@ -17,7 +17,6 @@ backupvolume = 1
 with open("settings.txt", 'r+') as settings:
     for line in settings:
         line = line.strip().split("=")
-        print(line)
         if line[0] == "width":
             try:
                 width = int(line[1])
@@ -48,6 +47,10 @@ SCREEN_WIDTH = width
 SCREEN_HEIGHT = height
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+
+# Font
+fontname = 'mriamc.ttf'
 
 
 # Subroutines
@@ -116,27 +119,62 @@ class Button:
 
 # Textbox class
 class Textbox:
-    def __init__(self, x, y, xsize, ysize, colour, hovercolour):
+    def __init__(self, x, y, xsize, ysize, colour, hovercolour, selectcolour):
+        self.x = x
+        self.y = y
         self.rect = pygame.Rect((x, y), (xsize, ysize))
         self.colour = colour
         self.hovercolour = hovercolour
+        self.selectcolour = selectcolour
+        self.selected = False
+        self.text = ''
+        self.font = pygame.font.Font(fontname, ysize)
+
+    def drawtext(self):
+        self.textsurface = self.font.render(self.text, True, (0, 255, 0))
+        screen.blit(self.textsurface, (self.x,self.y))
+
+    def drawbox(self):
+        pygame.draw.rect(screen, self.colour, self.rect)
+        self.drawtext()
+
+    def drawboxhover(self):
+        pygame.draw.rect(screen, self.hovercolour, self.rect)
+        self.drawtext()
+
+    def drawboxselect(self):
+        pygame.draw.rect(screen, self.selectcolour, self.rect)
+        self.drawtext()
 
     def draw(self):
-        if not ishover(self.rect):
-            pygame.draw.rect(screen, self.colour, self.rect)
+        if ishover(self.rect) and not self.selected: # If the mouse is hovered but the textbox isnt selected
+            self.drawboxhover()
+            if isclicked(self.rect): # If user clicks on the textbox
+                self.selected = True
         else:
-            pygame.draw.rect(screen, self.hovercolour, self.rect)
+            self.drawbox()
+            if pygame.mouse.get_pressed()[0]: # If anywhere except the textbox is clicked it is unselected
+                self.selected = False
+        if self.selected: # When the text box is selected
+            self.drawboxselect()
+
+            for event in pygame.event.get(): # Loop for detecting key presses in pygame events
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_BACKSPACE:
+                        self.text = self.text[:-1]
+                    else:
+                        self.text += event.unicode
 
 
 # Button Instances
 testbutton = Button(200, 200, pygame.image.load(r'Matrix Background.png'), pygame.image.load(r'Matrix Background.png'), 1)
 
 # Textbox Instances
-testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), (255, 255, 255))
+testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), (255, 255, 255), (255, 0, 0))
 
 
 # Text
-font = pygame.font.Font('mriamc.ttf', 96)
+font = pygame.font.Font(fontname, 96)
 
 # Essential variables
 state = 1 # 0 = Login menu, 1 = Main menu
