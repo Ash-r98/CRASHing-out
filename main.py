@@ -153,7 +153,7 @@ class Textbox:
                 self.selected = True
         else:
             self.drawbox()
-            if pygame.mouse.get_pressed()[0]: # If anywhere except the textbox is clicked it is unselected
+            if pygame.mouse.get_pressed()[0] and not ishover(self.rect): # If anywhere except the textbox is clicked it is unselected
                 self.selected = False
         if self.selected: # When the text box is selected
             self.drawboxselect()
