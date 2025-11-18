@@ -40,6 +40,8 @@ if height == None:
 if volume == None:
     volume = backupheight
 
+if int(width * 9/16) != height: # Force 16:9 aspect ratio based on width
+    height = int(width * 9/16)
 
 # Screen
 
@@ -52,6 +54,8 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 # Font
 fontname = 'mriamc.ttf'
 font = pygame.font.Font(fontname, 96)
+titlefontsize = int(96*(width/960))
+titlefont = pygame.font.Font(fontname, titlefontsize)
 
 # Subroutines
 
@@ -193,10 +197,12 @@ testbutton = Button(200, 200, pygame.image.load(r'Matrix Background.png'), pygam
 # Textbox Instances
 testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), (255, 255, 255), (255, 0, 0))
 
-
+# Text
+logintitle = titlefont.render('Login Menu', True, (0, 255, 0))
+logintitlepos = (width/2-(titlefontsize*3), height*1/10)
 
 # Essential variables
-state = 1 # 0 = Login menu, 1 = Main menu
+state = 0 # 0 = Login menu, 1 = Main menu
 
 # Devmode variables
 toggledev = False
@@ -214,12 +220,18 @@ while run:
         statetext = font.render(str(state), True, (255, 255, 255))
         screen.blit(statetext, (0, 100))
 
-    if state == 0: # Login menu
+
+
+    # Login menu
+    if state == 0:
+        test = testtextbox.draw()
+        screen.blit(logintitle, logintitlepos)
+
+
+    # Main menu
+    elif state == 1:
         if testbutton.draw():
             print("hi")
-
-    elif state == 1:
-        test = testtextbox.draw()
 
 
     else:
