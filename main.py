@@ -51,9 +51,14 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Font
 fontname = 'mriamc.ttf'
-
+font = pygame.font.Font(fontname, 96)
 
 # Subroutines
+
+# Devmode test text display
+def testtextdisplay(text):
+    testtext = font.render(text, True, (255, 255, 255))
+    screen.blit(testtext, (0, 0))
 
 # Object mouse hover detection
 def ishover(rect): # Takes a pygame rectangle object as a parameter
@@ -189,9 +194,6 @@ testbutton = Button(200, 200, pygame.image.load(r'Matrix Background.png'), pygam
 testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), (255, 255, 255), (255, 0, 0))
 
 
-# Text
-font = pygame.font.Font(fontname, 96)
-testtext = font.render('', True, (255, 255, 255))
 
 # Essential variables
 state = 1 # 0 = Login menu, 1 = Main menu
