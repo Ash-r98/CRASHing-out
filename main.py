@@ -129,11 +129,13 @@ class Textbox:
         self.hovercolour = hovercolour
         self.selectcolour = selectcolour
         self.selected = False
-        self.text = ''
+        self.displaytext = ''
+        self.finaltext = ''
+        self.textsurface = None
         self.font = pygame.font.Font(fontname, ysize)
 
     def drawtext(self):
-        self.textsurface = self.font.render(self.text, True, (0, 255, 0))
+        self.textsurface = self.font.render(self.displaytext, True, (0, 255, 0))
         screen.blit(self.textsurface, (self.x,self.y))
 
     def drawbox(self):
@@ -148,7 +150,13 @@ class Textbox:
         pygame.draw.rect(screen, self.selectcolour, self.rect)
         self.drawtext()
 
+    def submit(self):
+        print(self.finaltext)
+        return self.finaltext
+
     def draw(self):
+        submit = None
+
         if ishover(self.rect) and not self.selected: # If the mouse is hovered but the textbox isnt selected
             self.drawboxhover()
             if isclicked(self.rect): # If user clicks on the textbox
@@ -163,9 +171,15 @@ class Textbox:
             for event in pygame.event.get(): # Loop for detecting key presses in pygame events
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_BACKSPACE:
-                        self.text = self.text[:-1]
+                        self.displaytext = self.displaytext[:-1]
+                    elif event.key == pygame.K_RETURN:
+                        self.finaltext = self.displaytext
+                        self.displaytext = ''
+                        submit = self.submit()
+                        print(submit)
                     else:
-                        self.text += event.unicode
+                        self.displaytext += event.unicode
+        return submit
 
 
 # Button Instances
@@ -177,6 +191,7 @@ testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), (255, 255, 255), (255
 
 # Text
 font = pygame.font.Font(fontname, 96)
+testtext = font.render('', True, (255, 255, 255))
 
 # Essential variables
 state = 1 # 0 = Login menu, 1 = Main menu
@@ -202,7 +217,8 @@ while run:
             print("hi")
 
     elif state == 1:
-        testtextbox.draw()
+        test = testtextbox.draw()
+
 
     else:
         state = 0
