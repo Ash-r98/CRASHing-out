@@ -54,14 +54,23 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 # Font
 fontname = 'mriamc.ttf'
 font = pygame.font.Font(fontname, 96)
+
 titlefontsize = int(96*(width/960))
 titlefont = pygame.font.Font(fontname, titlefontsize)
+
+loginlabelfontsize = int(80*(width/960))
+loginlabelfont = pygame.font.Font(fontname, loginlabelfontsize)
+
+# Colours
+white = (255, 255, 255)
+green = (0, 255, 0)
+red = (255, 0, 0)
 
 # Subroutines
 
 # Devmode test text display
 def testtextdisplay(text):
-    testtext = font.render(text, True, (255, 255, 255))
+    testtext = font.render(text, True, white)
     screen.blit(testtext, (0, 0))
 
 # Object mouse hover detection
@@ -130,13 +139,14 @@ class Button:
 
 # Textbox class
 class Textbox:
-    def __init__(self, x, y, xsize, ysize, colour, hovercolour, selectcolour):
+    def __init__(self, x, y, xsize, ysize, colour, hovercolour, selectcolour, textcolour):
         self.x = x
         self.y = y
         self.rect = pygame.Rect((x, y), (xsize, ysize))
         self.colour = colour
         self.hovercolour = hovercolour
         self.selectcolour = selectcolour
+        self.textcolour = textcolour
         self.selected = False
         self.displaytext = ''
         self.finaltext = ''
@@ -144,7 +154,7 @@ class Textbox:
         self.font = pygame.font.Font(fontname, ysize)
 
     def drawtext(self):
-        self.textsurface = self.font.render(self.displaytext, True, (0, 255, 0))
+        self.textsurface = self.font.render(self.displaytext, True, self.textcolour)
         screen.blit(self.textsurface, (self.x,self.y))
 
     def drawbox(self):
@@ -160,7 +170,6 @@ class Textbox:
         self.drawtext()
 
     def submit(self):
-        print(self.finaltext)
         return self.finaltext
 
     def draw(self):
@@ -185,7 +194,7 @@ class Textbox:
                         self.finaltext = self.displaytext
                         self.displaytext = ''
                         submit = self.submit()
-                        print(submit)
+                        self.selected = False
                     else:
                         self.displaytext += event.unicode
         return submit
@@ -195,11 +204,18 @@ class Textbox:
 testbutton = Button(200, 200, pygame.image.load(r'Matrix Background.png'), pygame.image.load(r'Matrix Background.png'), 1)
 
 # Textbox Instances
-testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), (255, 255, 255), (255, 0, 0))
+testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), white, red, green)
+usernametextbox = Textbox(width/2, height/3, width*19/40, loginlabelfontsize, (50, 50, 50), (75, 75, 75), (100, 100, 100), green)
+passwordtextbox = Textbox(width/2, height*3/5, width*19/40, loginlabelfontsize, (50, 50, 50), (75, 75, 75), (100, 100, 100), green)
 
 # Text
-logintitle = titlefont.render('Login Menu', True, (0, 255, 0))
+# Login Menu Text
+logintitle = titlefont.render('Login Menu', True, green)
 logintitlepos = (width/2-(titlefontsize*3), height*1/10)
+usernametext = loginlabelfont.render('Username:', True, green)
+usernametextpos = (10, height*7/20)
+passwordtext = loginlabelfont.render('Password:', True, green)
+passwordtextpos = (10, height*6/10)
 
 # Essential variables
 state = 0 # 0 = Login menu, 1 = Main menu
@@ -224,8 +240,15 @@ while run:
 
     # Login menu
     if state == 0:
-        test = testtextbox.draw()
-        screen.blit(logintitle, logintitlepos)
+        screen.blit(logintitle, logintitlepos) # Login Menu Title
+        username = usernametextbox.draw()
+        screen.blit(usernametext, usernametextpos)
+        password = passwordtextbox.draw()
+        screen.blit(passwordtext, passwordtextpos)
+
+
+        #test = testtextbox.draw()
+
 
 
     # Main menu
@@ -253,6 +276,15 @@ while run:
         # If windows X button is used
         if event.type == pygame.QUIT:
             run = False
+
+        if devmode: # Devmode keybinds
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_0:
+                    state = 0
+                elif event.key == pygame.K_1:
+                    state = 1
+
+
 
     # Updates visual display every game loop (tick)
     pygame.display.update()
