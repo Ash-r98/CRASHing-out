@@ -247,18 +247,19 @@ while run:
         screen.blit(passwordtext, passwordtextpos)
 
 
-        #test = testtextbox.draw()
 
 
 
     # Main menu
     elif state == 1:
-        if testbutton.draw():
-            print("hi")
+        mainmenubackground = pygame.transform.scale(pygame.image.load(r'Matrix Background.png'), (width, height))
+        screen.blit(mainmenubackground, (0, 0))
 
 
+
+    # If no valid menu
     else:
-        state = 0
+        state = 0 # Reset to login
 
 
     # Key detection
