@@ -97,6 +97,7 @@ class Button:
         self.rect = self.image.get_rect()
         self.rect.topleft = (x,y)
         self.clicked = False
+        self.buffer = True
 
     def draw(self):
         action = False
@@ -105,7 +106,7 @@ class Button:
         if ishover(self.rect):
             # Draw hover button to screen
             screen.blit(self.hoverimage, (self.rect.x, self.rect.y))
-            if isclicked(self.rect) and self.clicked == False: # 0 = left click
+            if isclicked(self.rect) and self.clicked == False and self.buffer == False: # 0 = left click
                 self.clicked = True # Can only click once at a time
                 action = True
         else:
@@ -114,6 +115,7 @@ class Button:
 
         if not pygame.mouse.get_pressed()[0]:
             self.clicked = False # Resets if mouse is not held
+            self.buffer = False # User must have not clicked in order to click the button
 
         return action
 
