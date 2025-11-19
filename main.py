@@ -69,9 +69,9 @@ red = (255, 0, 0)
 # Subroutines
 
 # Devmode test text display
-def testtextdisplay(text):
+def testtextdisplay(text, pos):
     testtext = font.render(text, True, white)
-    screen.blit(testtext, (0, 0))
+    screen.blit(testtext, pos)
 
 # Object mouse hover detection
 def ishover(rect): # Takes a pygame rectangle object as a parameter
@@ -219,6 +219,8 @@ passwordtextpos = (10, height*6/10)
 
 # Essential variables
 state = 0 # 0 = Login menu, 1 = Main menu
+username = ''
+password = ''
 
 # Devmode variables
 toggledev = False
@@ -229,22 +231,22 @@ while run:
 
     screen.fill((0, 0, 0))  # Black background to reset previous game loop
 
-    # Devmode displays
-    if devmode:
-        devmodetext = font.render('DEVMODE', True, (255, 255, 255))
-        screen.blit(devmodetext, (0, 0))
-        statetext = font.render(str(state), True, (255, 255, 255))
-        screen.blit(statetext, (0, 100))
-
-
 
     # Login menu
     if state == 0:
         screen.blit(logintitle, logintitlepos) # Login Menu Title
-        username = usernametextbox.draw()
+
+        usernametemp = usernametextbox.draw()
         screen.blit(usernametext, usernametextpos)
-        password = passwordtextbox.draw()
+        if usernametemp != None:
+            username = usernametemp
+
+        passwordtemp = passwordtextbox.draw()
         screen.blit(passwordtext, passwordtextpos)
+        if passwordtemp != None:
+            password = passwordtemp
+
+
 
 
 
@@ -260,6 +262,19 @@ while run:
     # If no valid menu
     else:
         state = 0 # Reset to login
+
+
+
+
+
+
+
+    # Devmode displays
+    if devmode:
+        devmodetext = font.render('DEVMODE', True, (255, 255, 255))
+        screen.blit(devmodetext, (0, 0))
+        statetext = font.render(str(state), True, (255, 255, 255))
+        screen.blit(statetext, (0, 100))
 
 
     # Key detection
@@ -284,6 +299,8 @@ while run:
                     state = 0
                 elif event.key == pygame.K_1:
                     state = 1
+                elif event.key == pygame.K_2:
+                    state = 2
 
 
 
