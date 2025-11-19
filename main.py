@@ -251,7 +251,6 @@ while run:
 
 
 
-
     # Main menu
     elif state == 1:
         mainmenubackground = pygame.transform.scale(pygame.image.load(r'Matrix Background.png'), (width, height))
