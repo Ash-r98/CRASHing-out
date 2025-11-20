@@ -68,6 +68,9 @@ green = (0, 255, 0)
 red = (255, 0, 0)
 black = (0, 0, 0)
 blue = (0, 0, 255) # Not using this one
+darkgrey = (50, 50, 50)
+grey = (75, 75, 75)
+lightgrey = (100, 100, 100)
 
 # Subroutines
 
@@ -208,8 +211,8 @@ testbutton = Button(200, 200, pygame.image.load(Path('Sprites/Matrix Background.
 
 # Textbox Instances
 testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), white, red, green)
-usernametextbox = Textbox(width/2, height/3, width*19/40, loginlabelfontsize, (50, 50, 50), (75, 75, 75), (100, 100, 100), green)
-passwordtextbox = Textbox(width/2, height*3/5, width*19/40, loginlabelfontsize, (50, 50, 50), (75, 75, 75), (100, 100, 100), green)
+usernametextbox = Textbox(width/2, height/3, width*19/40, loginlabelfontsize, darkgrey, grey, lightgrey, green)
+passwordtextbox = Textbox(width/2, height*3/5, width*19/40, loginlabelfontsize, darkgrey, grey, lightgrey, green)
 
 # Text
 # Login Menu Text
