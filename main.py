@@ -1,4 +1,5 @@
 import pygame
+from pathlib import Path
 from time import sleep
 from random import randint
 
@@ -65,6 +66,8 @@ loginlabelfont = pygame.font.Font(fontname, loginlabelfontsize)
 white = (255, 255, 255)
 green = (0, 255, 0)
 red = (255, 0, 0)
+black = (0, 0, 0)
+blue = (0, 0, 255) # Not using this one
 
 # Subroutines
 
@@ -201,7 +204,7 @@ class Textbox:
 
 
 # Button Instances
-testbutton = Button(200, 200, pygame.image.load(r'Matrix Background.png'), pygame.image.load(r'Matrix Background.png'), 1)
+testbutton = Button(200, 200, pygame.image.load(Path('Sprites/Matrix Background.png')), pygame.image.load(Path('Sprites/Matrix Background.png')), 1)
 
 # Textbox Instances
 testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), white, red, green)
@@ -246,6 +249,9 @@ while run:
         if passwordtemp != None:
             password = passwordtemp
 
+        testtextdisplay(username, (0, 0))
+        testtextdisplay(password, (0, 70))
+
 
 
 
@@ -253,7 +259,7 @@ while run:
 
     # Main menu
     elif state == 1:
-        mainmenubackground = pygame.transform.scale(pygame.image.load(r'Matrix Background.png'), (width, height))
+        mainmenubackground = pygame.transform.scale(pygame.image.load(Path('Sprites/Matrix Background.png')), (width, height))
         screen.blit(mainmenubackground, (0, 0))
 
 
