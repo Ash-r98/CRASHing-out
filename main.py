@@ -62,6 +62,9 @@ titlefont = pygame.font.Font(fontname, titlefontsize)
 loginlabelfontsize = int(80*(width/960))
 loginlabelfont = pygame.font.Font(fontname, loginlabelfontsize)
 
+settingstitlefontsize = int(70*(width/960))
+settingstitlefont = pygame.font.Font(fontname, settingstitlefontsize)
+
 # Colours
 white = (255, 255, 255)
 green = (0, 255, 0)
@@ -99,6 +102,9 @@ def isclicked(rect): # Takes a pygame rectangle object as a parameter
             click = True
     return click # Always returns true or false
 
+def drawmainmenubackground(): # Draws the main menu background to the screen
+    mainmenubackground = pygame.transform.scale(pygame.image.load(Path('Sprites/Matrix Background.png')),(width, height))
+    screen.blit(mainmenubackground, (0, 0))
 
 
 
@@ -206,16 +212,20 @@ class Textbox:
         return submit
 
 
+
 # Button Instances
 testbutton = Button(200, 200, pygame.image.load(Path('Sprites/Matrix Background.png')), pygame.image.load(Path('Sprites/Matrix Background.png')), 1)
 quitbutton = Button(width/20, height/20, pygame.image.load(Path('Sprites/quitbutton.png')), pygame.image.load(Path('Sprites/quitbuttonhover.png')), width/1920)
+
 
 # Textbox Instances
 testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), white, red, green)
 usernametextbox = Textbox(width/2, height/3, width*19/40, loginlabelfontsize, darkgrey, grey, lightgrey, green)
 passwordtextbox = Textbox(width/2, height*3/5, width*19/40, loginlabelfontsize, darkgrey, grey, lightgrey, green)
 
+
 # Text
+
 # Login Menu Text
 logintitle = titlefont.render('Login Menu', True, green)
 logintitlepos = (width/2-(titlefontsize*3), height*1/10)
@@ -223,6 +233,18 @@ usernametext = loginlabelfont.render('Username:', True, green)
 usernametextpos = (10, height*7/20)
 passwordtext = loginlabelfont.render('Password:', True, green)
 passwordtextpos = (10, height*6/10)
+
+# Main Menu
+
+
+# Settings Menu
+backgroundbox = pygame.Rect((width/20, height/20), (width*9/10, height*9/10))
+settingsmenutitle = settingstitlefont.render('Settings Menu', True, white)
+settingsmenutitlepos = (width/20, height/20)
+
+# Friends Menu
+friendsmenutitle = settingstitlefont.render('Friends Menu', True, white) # Uses same font as settings
+friendsmenutitlepos = (width/20, height/20)
 
 # Essential variables
 state = 0 # 0 = Login menu, 1 = Main menu
@@ -263,11 +285,30 @@ while run:
 
     # Main menu
     elif state == 1:
-        mainmenubackground = pygame.transform.scale(pygame.image.load(Path('Sprites/Matrix Background.png')), (width, height))
-        screen.blit(mainmenubackground, (0, 0))
+        drawmainmenubackground()
 
         if quitbutton.draw():
             run = False
+
+
+
+    # Settings menu
+    elif state == 2:
+        drawmainmenubackground()
+
+        pygame.draw.rect(screen, black, backgroundbox)
+        screen.blit(settingsmenutitle, settingsmenutitlepos)
+
+
+
+    # Friends menu
+    elif state == 3:
+        drawmainmenubackground()
+
+        pygame.draw.rect(screen, black, backgroundbox)
+        screen.blit(friendsmenutitle, friendsmenutitlepos)
+
+
 
 
 
@@ -313,6 +354,8 @@ while run:
                     state = 1
                 elif event.key == pygame.K_2:
                     state = 2
+                elif event.key == pygame.K_3:
+                    state = 3
 
 
 
