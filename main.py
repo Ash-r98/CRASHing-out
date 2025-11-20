@@ -208,6 +208,7 @@ class Textbox:
 
 # Button Instances
 testbutton = Button(200, 200, pygame.image.load(Path('Sprites/Matrix Background.png')), pygame.image.load(Path('Sprites/Matrix Background.png')), 1)
+quitbutton = Button(width/20, height/20, pygame.image.load(Path('Sprites/quitbutton.png')), pygame.image.load(Path('Sprites/quitbuttonhover.png')), width/1920)
 
 # Textbox Instances
 testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), white, red, green)
@@ -264,6 +265,9 @@ while run:
     elif state == 1:
         mainmenubackground = pygame.transform.scale(pygame.image.load(Path('Sprites/Matrix Background.png')), (width, height))
         screen.blit(mainmenubackground, (0, 0))
+
+        if quitbutton.draw():
+            run = False
 
 
 
