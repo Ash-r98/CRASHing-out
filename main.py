@@ -56,6 +56,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 fontname = 'mriamc.ttf'
 font = pygame.font.Font(fontname, 96)
 
+# Font template: int((font size in 960:540) * (width/960))
 titlefontsize = int(96*(width/960))
 titlefont = pygame.font.Font(fontname, titlefontsize)
 
@@ -64,6 +65,9 @@ loginlabelfont = pygame.font.Font(fontname, loginlabelfontsize)
 
 settingstitlefontsize = int(70*(width/960))
 settingstitlefont = pygame.font.Font(fontname, settingstitlefontsize)
+
+quitconfirmfontsize = int(50*(width/960))
+quitconfirmfont = pygame.font.Font(fontname, quitconfirmfontsize)
 
 # Colours
 white = (255, 255, 255)
@@ -74,6 +78,9 @@ blue = (0, 0, 255) # Not using this one
 darkgrey = (50, 50, 50)
 grey = (75, 75, 75)
 lightgrey = (100, 100, 100)
+
+
+
 
 # Subroutines
 
@@ -105,11 +112,6 @@ def isclicked(rect): # Takes a pygame rectangle object as a parameter
 def drawmainmenubackground(): # Draws the main menu background to the screen
     mainmenubackground = pygame.transform.scale(pygame.image.load(Path('Sprites/Matrix Background.png')),(width, height))
     screen.blit(mainmenubackground, (0, 0))
-
-
-
-
-
 
 
 
@@ -148,6 +150,7 @@ class Button:
             self.buffer = False # User must have not clicked in order to click the button
 
         return action
+
 
 # Textbox class
 class Textbox:
@@ -215,8 +218,9 @@ class Textbox:
 
 # Button Instances
 testbutton = Button(200, 200, pygame.image.load(Path('Sprites/Matrix Background.png')), pygame.image.load(Path('Sprites/Matrix Background.png')), 1)
-quitbutton = Button(width/20, height/20, pygame.image.load(Path('Sprites/quitbutton.png')), pygame.image.load(Path('Sprites/quitbuttonhover.png')), width/1920)
-
+quitbutton = Button(width/20, height/20, pygame.image.load(Path('Sprites/xsprite.png')), pygame.image.load(Path('Sprites/xspritehover.png')), width/1920)
+quitconfirmbutton = Button(width*8/20, height/2, pygame.image.load(Path('Sprites/ticksprite.png')), pygame.image.load(Path('Sprites/tickspritehover.png')), width/1920)
+quitcancelbutton = Button(width*11/20, height/2, pygame.image.load(Path('Sprites/xsprite.png')), pygame.image.load(Path('Sprites/xspritehover.png')), width/1920)
 
 # Textbox Instances
 testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), white, red, green)
@@ -235,7 +239,9 @@ passwordtext = loginlabelfont.render('Password:', True, green)
 passwordtextpos = (10, height*6/10)
 
 # Main Menu
-
+quitconfirmbox = pygame.Rect((width/6, height*2/5), (width*2/3, height/5))
+quitconfirmtext = quitconfirmfont.render('Exit the simulation?', True, white)
+quitconfirmtextpos = (width/5, height*2/5)
 
 # Settings Menu
 backgroundbox = pygame.Rect((width/20, height/20), (width*9/10, height*9/10))
@@ -250,6 +256,7 @@ friendsmenutitlepos = (width/20, height/20)
 state = 0 # 0 = Login menu, 1 = Main menu
 username = ''
 password = ''
+quitconfirm = False
 
 # Devmode variables
 toggledev = False
@@ -288,7 +295,17 @@ while run:
         drawmainmenubackground()
 
         if quitbutton.draw():
-            run = False
+            quitconfirm = True
+
+        if quitconfirm:
+            # Confirmation box
+            pygame.draw.rect(screen, black, quitconfirmbox)
+            screen.blit(quitconfirmtext, quitconfirmtextpos)
+
+            if quitconfirmbutton.draw(): # If user presses tick, close game
+                run = False
+            elif quitcancelbutton.draw(): # If user presses x, close quit box
+                quitconfirm = False
 
 
 
