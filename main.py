@@ -221,6 +221,8 @@ testbutton = Button(200, 200, pygame.image.load(Path('Sprites/Matrix Background.
 quitbutton = Button(width/20, height/20, pygame.image.load(Path('Sprites/xsprite.png')), pygame.image.load(Path('Sprites/xspritehover.png')), width/1920)
 quitconfirmbutton = Button(width*8/20, height/2, pygame.image.load(Path('Sprites/ticksprite.png')), pygame.image.load(Path('Sprites/tickspritehover.png')), width/1920)
 quitcancelbutton = Button(width*11/20, height/2, pygame.image.load(Path('Sprites/xsprite.png')), pygame.image.load(Path('Sprites/xspritehover.png')), width/1920)
+backbutton = Button(width*33/40, height*15/20, pygame.image.load(Path('Sprites/backbutton.png')), pygame.image.load(Path('Sprites/backbuttonhover.png')), width/960)
+
 
 # Textbox Instances
 testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), white, red, green)
@@ -316,6 +318,8 @@ while run:
         pygame.draw.rect(screen, black, backgroundbox)
         screen.blit(settingsmenutitle, settingsmenutitlepos)
 
+        if backbutton.draw():
+            state = 1
 
 
     # Friends menu
@@ -326,6 +330,8 @@ while run:
         screen.blit(friendsmenutitle, friendsmenutitlepos)
 
 
+        if backbutton.draw():
+            state = 1
 
 
 
