@@ -2,6 +2,7 @@ import pygame
 from pathlib import Path
 from time import sleep
 from random import randint
+from datetime import datetime, timedelta
 
 pygame.init()
 pygame.display.set_caption('CRASHing out')
@@ -130,6 +131,13 @@ class Button:
         self.rect.topleft = (x,y)
         self.clicked = False
         self.buffer = True
+        self.enabled = True
+
+    def enable(self):
+        self.enabled = True
+
+    def disable(self):
+        self.enabled = False
 
     def draw(self):
         action = False
@@ -138,7 +146,7 @@ class Button:
         if ishover(self.rect):
             # Draw hover button to screen
             screen.blit(self.hoverimage, (self.rect.x, self.rect.y))
-            if isclicked(self.rect) and self.clicked == False and self.buffer == False: # 0 = left click
+            if isclicked(self.rect) and not self.clicked and not self.buffer and self.enabled: # 0 = left click
                 self.clicked = True # Can only click once at a time
                 action = True
         else:
@@ -221,9 +229,9 @@ quitbutton = Button(width/20, height/20, pygame.image.load(Path('Sprites/xsprite
 quitconfirmbutton = Button(width*8/20, height/2, pygame.image.load(Path('Sprites/ticksprite.png')), pygame.image.load(Path('Sprites/tickspritehover.png')), width/1920)
 quitcancelbutton = Button(width*11/20, height/2, pygame.image.load(Path('Sprites/xsprite.png')), pygame.image.load(Path('Sprites/xspritehover.png')), width/1920)
 backbutton = Button(width*33/40, height*3/4, pygame.image.load(Path('Sprites/backbutton.png')), pygame.image.load(Path('Sprites/backbuttonhover.png')), width/960)
-settingsbutton = Button(width*2/3, height/2, pygame.image.load(Path('Sprites/settingsbutton.png')), pygame.image.load(Path('Sprites/settingsbuttonhover.png')), width/960)
-friendsbutton = Button(width*1/4, height/2, pygame.image.load(Path('Sprites/black.png')), pygame.image.load(Path('Sprites/white.png')), width/960)
-
+settingsbutton = Button(width*7/9, height/2, pygame.image.load(Path('Sprites/settingsbutton.png')), pygame.image.load(Path('Sprites/settingsbuttonhover.png')), width/960)
+friendsbutton = Button(width*1/7, height/2, pygame.image.load(Path('Sprites/black.png')), pygame.image.load(Path('Sprites/white.png')), width/960)
+playbutton = Button(width*2/5, height*2/5, pygame.image.load(Path('Sprites/black.png')), pygame.image.load(Path('Sprites/white.png')), width/480)
 
 # Textbox Instances
 usernametextbox = Textbox(width/2, height/3, width*19/40, loginlabelfontsize, darkgrey, grey, lightgrey, green)
@@ -289,25 +297,9 @@ while run:
 
 
 
-
-
-
     # Main menu
     elif state == 1:
         drawmainmenubackground()
-
-
-        if settingsbutton.draw():
-            state = 2
-
-
-        if friendsbutton.draw():
-            state = 3
-
-
-        if quitbutton.draw():
-            quitconfirm = True
-
 
         if quitconfirm:
             # Confirmation box
@@ -318,6 +310,22 @@ while run:
                 run = False
             elif quitcancelbutton.draw(): # If user presses x, close quit box
                 quitconfirm = False
+                quitcancelnow = datetime.now()
+
+        else:
+            if settingsbutton.draw():
+                state = 2
+
+            if friendsbutton.draw():
+                state = 3
+
+            if playbutton.draw():
+                playnow = datetime.now()
+                if playnow - quitcancelnow > timedelta(milliseconds=500):
+                    state = 4
+
+            if quitbutton.draw():
+                quitconfirm = True
 
 
 
@@ -342,6 +350,18 @@ while run:
 
         if backbutton.draw():
             state = 1
+
+
+
+    # Starter Deck Select
+    elif state == 4:
+
+
+
+
+        if backbutton.draw():
+            state = 1
+
 
 
 
@@ -389,7 +409,8 @@ while run:
                     state = 2
                 elif event.key == pygame.K_3:
                     state = 3
-
+                elif event.key == pygame.K_4:
+                    state = 4
 
 
     # Updates visual display every game loop (tick)
