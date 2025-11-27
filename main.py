@@ -223,19 +223,46 @@ class Textbox:
         return submit
 
 
+# Character Class
+class Character:
+    def __init__(self, name, sprite, selectbutton, selectbuttonhover, startingdeck):
+        self.name = name
+        self.sprite = sprite
+        self.selectbutton = selectbutton
+        self.startingdeck = startingdeck
+
+
+
+# Sprites
+xsprite = pygame.image.load(Path('Sprites/xsprite.png'))
+xspritehover = pygame.image.load(Path('Sprites/xspritehover.png'))
+ticksprite = pygame.image.load(Path('Sprites/ticksprite.png'))
+tickspritehover = pygame.image.load(Path('Sprites/tickspritehover.png'))
+backsprite = pygame.image.load(Path('Sprites/backbutton.png'))
+backspritehover = pygame.image.load(Path('Sprites/backbuttonhover.png'))
+settingssprite = pygame.image.load(Path('Sprites/settingsbutton.png'))
+settingsspritehover = pygame.image.load(Path('Sprites/settingsbuttonhover.png'))
+blacksprite = pygame.image.load(Path('Sprites/black.png'))
+whitesprite = pygame.image.load(Path('Sprites/white.png'))
+
 
 # Button Instances
-quitbutton = Button(width/20, height/20, pygame.image.load(Path('Sprites/xsprite.png')), pygame.image.load(Path('Sprites/xspritehover.png')), width/1920)
-quitconfirmbutton = Button(width*8/20, height/2, pygame.image.load(Path('Sprites/ticksprite.png')), pygame.image.load(Path('Sprites/tickspritehover.png')), width/1920)
-quitcancelbutton = Button(width*11/20, height/2, pygame.image.load(Path('Sprites/xsprite.png')), pygame.image.load(Path('Sprites/xspritehover.png')), width/1920)
-backbutton = Button(width*33/40, height*3/4, pygame.image.load(Path('Sprites/backbutton.png')), pygame.image.load(Path('Sprites/backbuttonhover.png')), width/960)
-settingsbutton = Button(width*7/9, height/2, pygame.image.load(Path('Sprites/settingsbutton.png')), pygame.image.load(Path('Sprites/settingsbuttonhover.png')), width/960)
-friendsbutton = Button(width*1/7, height/2, pygame.image.load(Path('Sprites/black.png')), pygame.image.load(Path('Sprites/white.png')), width/960)
-playbutton = Button(width*2/5, height*2/5, pygame.image.load(Path('Sprites/black.png')), pygame.image.load(Path('Sprites/white.png')), width/480)
+quitbutton = Button(width/20, height/20, xsprite, xspritehover, width/1920)
+quitconfirmbutton = Button(width*8/20, height/2, ticksprite, tickspritehover, width/1920)
+quitcancelbutton = Button(width*11/20, height/2, xsprite, xspritehover, width/1920)
+backbutton = Button(width*33/40, height*3/4, backsprite, backspritehover, width/960)
+settingsbutton = Button(width*7/9, height/2, settingssprite, settingsspritehover, width/960)
+friendsbutton = Button(width*1/7, height/2, blacksprite, whitesprite, width/960)
+playbutton = Button(width*2/5, height*2/5, blacksprite, whitesprite, width/480)
+
 
 # Textbox Instances
 usernametextbox = Textbox(width/2, height/3, width*19/40, loginlabelfontsize, darkgrey, grey, lightgrey, green)
 passwordtextbox = Textbox(width/2, height*3/5, width*19/40, loginlabelfontsize, darkgrey, grey, lightgrey, green)
+
+
+# Character Instances
+hero = Character('Hero', whitesprite, blacksprite, whitesprite, [])
 
 
 # Text
@@ -267,6 +294,7 @@ state = 0 # 0 = Login menu, 1 = Main menu
 username = ''
 password = ''
 quitconfirm = False
+quitcancelnow = datetime.now()
 
 # Devmode variables
 toggledev = False
