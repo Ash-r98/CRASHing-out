@@ -217,16 +217,15 @@ class Textbox:
 
 
 # Button Instances
-testbutton = Button(200, 200, pygame.image.load(Path('Sprites/Matrix Background.png')), pygame.image.load(Path('Sprites/Matrix Background.png')), 1)
 quitbutton = Button(width/20, height/20, pygame.image.load(Path('Sprites/xsprite.png')), pygame.image.load(Path('Sprites/xspritehover.png')), width/1920)
 quitconfirmbutton = Button(width*8/20, height/2, pygame.image.load(Path('Sprites/ticksprite.png')), pygame.image.load(Path('Sprites/tickspritehover.png')), width/1920)
 quitcancelbutton = Button(width*11/20, height/2, pygame.image.load(Path('Sprites/xsprite.png')), pygame.image.load(Path('Sprites/xspritehover.png')), width/1920)
 backbutton = Button(width*33/40, height*3/4, pygame.image.load(Path('Sprites/backbutton.png')), pygame.image.load(Path('Sprites/backbuttonhover.png')), width/960)
 settingsbutton = Button(width*2/3, height/2, pygame.image.load(Path('Sprites/settingsbutton.png')), pygame.image.load(Path('Sprites/settingsbuttonhover.png')), width/960)
+friendsbutton = Button(width*1/4, height/2, pygame.image.load(Path('Sprites/black.png')), pygame.image.load(Path('Sprites/white.png')), width/960)
 
 
 # Textbox Instances
-testtextbox = Textbox(200, 200, 400, 100, (200, 200, 200), white, red, green)
 usernametextbox = Textbox(width/2, height/3, width*19/40, loginlabelfontsize, darkgrey, grey, lightgrey, green)
 passwordtextbox = Textbox(width/2, height*3/5, width*19/40, loginlabelfontsize, darkgrey, grey, lightgrey, green)
 
@@ -302,8 +301,13 @@ while run:
             state = 2
 
 
+        if friendsbutton.draw():
+            state = 3
+
+
         if quitbutton.draw():
             quitconfirm = True
+
 
         if quitconfirm:
             # Confirmation box
