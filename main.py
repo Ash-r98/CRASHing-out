@@ -53,35 +53,6 @@ SCREEN_HEIGHT = height
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 
-# Font
-fontname = 'mriamc.ttf'
-font = pygame.font.Font(fontname, 96)
-
-# Font template: int((font size in 960:540) * (width/960))
-titlefontsize = int(96*(width/960))
-titlefont = pygame.font.Font(fontname, titlefontsize)
-
-loginlabelfontsize = int(80*(width/960))
-loginlabelfont = pygame.font.Font(fontname, loginlabelfontsize)
-
-settingstitlefontsize = int(70*(width/960))
-settingstitlefont = pygame.font.Font(fontname, settingstitlefontsize)
-
-quitconfirmfontsize = int(50*(width/960))
-quitconfirmfont = pygame.font.Font(fontname, quitconfirmfontsize)
-
-# Colours
-white = (255, 255, 255)
-green = (0, 255, 0)
-red = (255, 0, 0)
-black = (0, 0, 0)
-blue = (0, 0, 255) # Not using this one
-darkgrey = (50, 50, 50)
-grey = (75, 75, 75)
-lightgrey = (100, 100, 100)
-
-
-
 
 # Subroutines
 
@@ -113,7 +84,6 @@ def isclicked(rect): # Takes a pygame rectangle object as a parameter
 def drawmainmenubackground(): # Draws the main menu background to the screen
     mainmenubackground = pygame.transform.scale(pygame.image.load(Path('Sprites/Matrix Background.png')),(width, height))
     screen.blit(mainmenubackground, (0, 0))
-
 
 
 
@@ -156,6 +126,26 @@ class Button:
         if not pygame.mouse.get_pressed()[0]:
             self.clicked = False # Resets if mouse is not held
             self.buffer = False # User must have not clicked in order to click the button
+
+        return action
+
+    # Draws the button without the buffer, so buttons created during loops can be pressed
+    def drawnobuffer(self):
+        action = False
+
+        # Check mouseover and click conditions
+        if ishover(self.rect):
+            # Draw hover button to screen
+            screen.blit(self.hoverimage, (self.rect.x, self.rect.y))
+            if isclicked(self.rect) and self.clicked == False:  # 0 = left click
+                self.clicked = True  # Can only click once at a time
+                action = True
+        else:
+            # Draw normal button to screen
+            screen.blit(self.image, (self.rect.x, self.rect.y))
+
+        if not pygame.mouse.get_pressed()[0]:
+            self.clicked = False  # Resets if mouse is not held
 
         return action
 
@@ -233,6 +223,35 @@ class Character:
 
 
 
+# Font
+fontname = 'mriamc.ttf'
+font = pygame.font.Font(fontname, 96)
+
+# Font template: int((font size in 960:540) * (width/960))
+titlefontsize = int(96*(width/960))
+titlefont = pygame.font.Font(fontname, titlefontsize)
+
+loginlabelfontsize = int(80*(width/960))
+loginlabelfont = pygame.font.Font(fontname, loginlabelfontsize)
+
+settingstitlefontsize = int(70*(width/960))
+settingstitlefont = pygame.font.Font(fontname, settingstitlefontsize)
+
+quitconfirmfontsize = int(50*(width/960))
+quitconfirmfont = pygame.font.Font(fontname, quitconfirmfontsize)
+
+# Colours
+white = (255, 255, 255)
+green = (0, 255, 0)
+red = (255, 0, 0)
+black = (0, 0, 0)
+blue = (0, 0, 255) # Not using this one
+darkgrey = (50, 50, 50)
+grey = (75, 75, 75)
+lightgrey = (100, 100, 100)
+
+
+
 # Sprites
 xsprite = pygame.image.load(Path('Sprites/xsprite.png'))
 xspritehover = pygame.image.load(Path('Sprites/xspritehover.png'))
@@ -245,6 +264,11 @@ settingsspritehover = pygame.image.load(Path('Sprites/settingsbuttonhover.png'))
 blacksprite = pygame.image.load(Path('Sprites/black.png'))
 whitesprite = pygame.image.load(Path('Sprites/white.png'))
 
+
+# Character Instances
+hero = Character('Hero', whitesprite, blacksprite, whitesprite, [])
+
+characterlist = [hero]
 
 # Button Instances
 quitbutton = Button(width/20, height/20, xsprite, xspritehover, width/1920)
@@ -260,9 +284,6 @@ playbutton = Button(width*2/5, height*2/5, blacksprite, whitesprite, width/480)
 usernametextbox = Textbox(width/2, height/3, width*19/40, loginlabelfontsize, darkgrey, grey, lightgrey, green)
 passwordtextbox = Textbox(width/2, height*3/5, width*19/40, loginlabelfontsize, darkgrey, grey, lightgrey, green)
 
-
-# Character Instances
-hero = Character('Hero', whitesprite, blacksprite, whitesprite, [])
 
 
 # Text
