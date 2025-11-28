@@ -219,6 +219,7 @@ class Character:
         self.name = name
         self.sprite = sprite
         self.selectbutton = selectbutton
+        self.selectbuttonhover = selectbuttonhover
         self.startingdeck = startingdeck
 
 
@@ -266,9 +267,10 @@ whitesprite = pygame.image.load(Path('Sprites/white.png'))
 
 
 # Character Instances
-hero = Character('Hero', whitesprite, blacksprite, whitesprite, [])
+hero = Character('Hero', whitesprite, whitesprite, blacksprite, [])
+test = Character('test', whitesprite, whitesprite, blacksprite, [])
 
-characterlist = [hero]
+characterlist = [hero, test]
 
 # Button Instances
 quitbutton = Button(width/20, height/20, xsprite, xspritehover, width/1920)
@@ -316,6 +318,8 @@ username = ''
 password = ''
 quitconfirm = False
 quitcancelnow = datetime.now()
+playnow = datetime.now()
+chrselectnow = datetime.now()
 
 # Devmode variables
 toggledev = False
@@ -361,6 +365,7 @@ while run:
                 quitconfirm = False
                 quitcancelnow = datetime.now()
 
+
         else:
             if settingsbutton.draw():
                 state = 2
@@ -404,7 +409,19 @@ while run:
 
     # Starter Deck Select
     elif state == 4:
+        y = height*3/5
+        chrnum = len(characterlist)
 
+        for i in range(chrnum):
+            x = width * ((i+1) / (chrnum+1)) - (50 * width/960)
+
+            characterbutton = Button(x, y, characterlist[i].selectbutton, characterlist[i].selectbuttonhover, width/960)
+
+            if characterbutton.drawnobuffer():
+                # Can't select until 500ms after entering menu
+                chrselectnow = datetime.now()
+                if chrselectnow - playnow > timedelta(milliseconds=500):
+                    testtextdisplay("YES!", (0, 0))
 
 
 
@@ -460,6 +477,9 @@ while run:
                     state = 3
                 elif event.key == pygame.K_4:
                     state = 4
+
+                elif event.key == pygame.K_q:
+                    run = False # Quick quit game button for testing
 
 
     # Updates visual display every game loop (tick)
