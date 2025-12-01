@@ -52,13 +52,16 @@ SCREEN_HEIGHT = height
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+# Fontname
+fontname = 'mriamc.ttf'
 
 
 # Subroutines
 
 # Devmode test text display
-def testtextdisplay(text, pos):
-    testtext = font.render(text, True, white)
+def textdisplay(text, pos, fontsize):
+    tempfont = pygame.font.Font(fontname, int(fontsize))
+    testtext = tempfont.render(text, True, white)
     screen.blit(testtext, pos)
 
 # Object mouse hover detection
@@ -114,6 +117,12 @@ class Button:
 
         # Check mouseover and click conditions
         if ishover(self.rect):
+
+            # Only resets clicked and buffer if mouse is not held on hover
+            if not pygame.mouse.get_pressed()[0]:
+                self.clicked = False  # Resets if mouse is not held
+                self.buffer = False  # User must have not clicked in order to click the button
+
             # Draw hover button to screen
             screen.blit(self.hoverimage, (self.rect.x, self.rect.y))
             if isclicked(self.rect) and not self.clicked and not self.buffer and self.enabled: # 0 = left click
@@ -122,10 +131,6 @@ class Button:
         else:
             # Draw normal button to screen
             screen.blit(self.image, (self.rect.x, self.rect.y))
-
-        if not pygame.mouse.get_pressed()[0]:
-            self.clicked = False # Resets if mouse is not held
-            self.buffer = False # User must have not clicked in order to click the button
 
         return action
 
@@ -215,20 +220,29 @@ class Textbox:
 
 # Character Class
 class Character:
-    def __init__(self, name, sprite, selectbutton, selectbuttonhover, startingdeck):
+    def __init__(self, name, sprite, selectbutton, selectbuttonhover, startingdeck, background, description):
         self.name = name
         self.sprite = sprite
         self.selectbutton = selectbutton
         self.selectbuttonhover = selectbuttonhover
         self.startingdeck = startingdeck
+        self.selectbackground = pygame.transform.scale(pygame.image.load(Path(f'Sprites/{background}')), (width, height))
+        self.description = description
+        self.selected = False # True when button in select menu is clicked
+
+    def selectbuttonclick(self):
+        self.selected = not self.selected
+
+    def selectdisplay(self):
+        screen.blit(self.selectbackground, (0, 0))
+        textdisplay(self.name, (0, 0), width/10)
+        textdisplay(self.description, (0, 100), width/30)
 
 
-
-# Font
-fontname = 'mriamc.ttf'
-font = pygame.font.Font(fontname, 96)
 
 # Font template: int((font size in 960:540) * (width/960))
+font = pygame.font.Font(fontname, 96)
+
 titlefontsize = int(96*(width/960))
 titlefont = pygame.font.Font(fontname, titlefontsize)
 
@@ -267,8 +281,8 @@ whitesprite = pygame.image.load(Path('Sprites/white.png'))
 
 
 # Character Instances
-hero = Character('Hero', whitesprite, whitesprite, blacksprite, [])
-test = Character('test', whitesprite, whitesprite, blacksprite, [])
+hero = Character('Hero', whitesprite, whitesprite, blacksprite, [], 'Matrix Background.png', 'The hero is cool')
+test = Character('test', whitesprite, whitesprite, blacksprite, [], 'xsprite.png', 'test description')
 
 characterlist = [hero, test]
 
@@ -320,6 +334,7 @@ quitconfirm = False
 quitcancelnow = datetime.now()
 playnow = datetime.now()
 chrselectnow = datetime.now()
+prevchrselectnow = datetime.now()
 
 # Devmode variables
 toggledev = False
@@ -345,8 +360,8 @@ while run:
         if passwordtemp != None:
             password = passwordtemp
 
-        testtextdisplay(username, (0, 0))
-        testtextdisplay(password, (0, 70))
+        textdisplay(username, (0, 0), 100)
+        textdisplay(password, (0, 70), 100)
 
 
 
@@ -412,6 +427,15 @@ while run:
         y = height*3/5
         chrnum = len(characterlist)
 
+        # Loop to find what is already selected
+        for i in range(chrnum):
+            if characterlist[i].selected:
+                characterlist[i].selectdisplay()
+                currentselect = i
+                for j in range(chrnum):
+                    if j != i:
+                        characterlist[j].selected = False
+
         for i in range(chrnum):
             x = width * ((i+1) / (chrnum+1)) - (50 * width/960)
 
@@ -420,12 +444,16 @@ while run:
             if characterbutton.drawnobuffer():
                 # Can't select until 500ms after entering menu
                 chrselectnow = datetime.now()
-                if chrselectnow - playnow > timedelta(milliseconds=500):
-                    testtextdisplay("YES!", (0, 0))
+                if chrselectnow - playnow > timedelta(milliseconds=500) and chrselectnow - prevchrselectnow > timedelta(milliseconds=500):
+                    characterlist[i].selectbuttonclick()
+                prevchrselectnow = datetime.now() # Sets the previous select at the end
 
 
 
         if backbutton.draw():
+            # Deselect all characters on back button press
+            for i in range(chrnum):
+                characterlist[i].selected = False
             state = 1
 
 
