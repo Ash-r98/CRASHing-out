@@ -286,6 +286,7 @@ test = Character('test', whitesprite, whitesprite, blacksprite, [], 'xsprite.png
 
 characterlist = [hero, test]
 
+
 # Button Instances
 quitbutton = Button(width/20, height/20, xsprite, xspritehover, width/1920)
 quitconfirmbutton = Button(width*8/20, height/2, ticksprite, tickspritehover, width/1920)
@@ -294,6 +295,7 @@ backbutton = Button(width*33/40, height*3/4, backsprite, backspritehover, width/
 settingsbutton = Button(width*7/9, height/2, settingssprite, settingsspritehover, width/960)
 friendsbutton = Button(width*1/7, height/2, blacksprite, whitesprite, width/960)
 playbutton = Button(width*2/5, height*2/5, blacksprite, whitesprite, width/480)
+startrunbutton = Button(width*33/40, height*2/5, blacksprite, whitesprite, width/960)
 
 
 # Textbox Instances
@@ -431,10 +433,8 @@ while run:
         for i in range(chrnum):
             if characterlist[i].selected:
                 characterlist[i].selectdisplay()
-                currentselect = i
-                for j in range(chrnum):
-                    if j != i:
-                        characterlist[j].selected = False
+                if startrunbutton.drawnobuffer():
+                    pass # Start run
 
         for i in range(chrnum):
             x = width * ((i+1) / (chrnum+1)) - (50 * width/960)
@@ -446,6 +446,10 @@ while run:
                 chrselectnow = datetime.now()
                 if chrselectnow - playnow > timedelta(milliseconds=500) and chrselectnow - prevchrselectnow > timedelta(milliseconds=500):
                     characterlist[i].selectbuttonclick()
+                    # Deselect all other buttons
+                    for j in range(chrnum):
+                        if j != i:
+                            characterlist[j].selected = False
                 prevchrselectnow = datetime.now() # Sets the previous select at the end
 
 
