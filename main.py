@@ -11,9 +11,13 @@ pygame.display.set_caption('CRASHing out')
 width = None
 height = None
 volume = None
+difficulty = None
+autosynchighscore = None
 backupwidth = 960
 backupheight = 540
 backupvolume = 1
+backupdifficulty = 1
+backupautosynchighscore = False
 
 # Settings
 with open("settings.txt", 'r+') as settings:
@@ -34,6 +38,16 @@ with open("settings.txt", 'r+') as settings:
                 volume = int(line[1])
             except:
                 volume = backupvolume
+        elif line[0] == "difficulty":
+            try:
+                difficulty = int(line[1])
+            except:
+                difficulty = backupdifficulty
+        elif line[0] == "autosynchighscore":
+            if line[1] == '1':
+                autosynchighscore = True
+            else:
+                autosynchighscore = False
 
 if width == None:
     width = backupwidth
@@ -41,6 +55,10 @@ if height == None:
     height = backupheight
 if volume == None:
     volume = backupheight
+if difficulty == None:
+    difficulty = backupdifficulty
+if autosynchighscore == None:
+    autosynchighscore = backupautosynchighscore
 
 if int(width * 9/16) != height: # Force 16:9 aspect ratio based on width
     height = int(width * 9/16)
