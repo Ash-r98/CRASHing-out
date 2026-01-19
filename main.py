@@ -296,6 +296,8 @@ settingssprite = pygame.image.load(Path('Sprites/settingsbutton.png'))
 settingsspritehover = pygame.image.load(Path('Sprites/settingsbuttonhover.png'))
 playsprite = pygame.image.load(Path('Sprites/playsprite.png'))
 playspritehover = pygame.image.load(Path('Sprites/playspritehover.png'))
+heartsprite = pygame.image.load(Path('Sprites/heartsprite.png'))
+heartspritehover = pygame.image.load(Path('Sprites/heartspritehover.png'))
 blacksprite = pygame.image.load(Path('Sprites/black.png'))
 whitesprite = pygame.image.load(Path('Sprites/white.png'))
 
@@ -313,7 +315,7 @@ quitconfirmbutton = Button(width*8/20, height/2, ticksprite, tickspritehover, wi
 quitcancelbutton = Button(width*11/20, height/2, xsprite, xspritehover, width/1920)
 backbutton = Button(width*33/40, height*3/4, backsprite, backspritehover, width/960)
 settingsbutton = Button(width*7/9, height/2, settingssprite, settingsspritehover, width/960)
-friendsbutton = Button(width*1/7, height/2, blacksprite, whitesprite, width/960)
+friendsbutton = Button(width*1/7, height/2, heartsprite, heartspritehover, width/960)
 playbutton = Button(width*2/5, height*2/5, playsprite, playspritehover, width/480)
 startrunbutton = Button(width*33/40, height*2/5, playsprite, playspritehover, width/960)
 
