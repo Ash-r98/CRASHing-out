@@ -406,19 +406,23 @@ while run:
 
 
         else:
+            # Settings button
             if settingsbutton.draw():
-                state = 2
+                state = 2 # Move to settings menu
 
+            # Friends button
             if friendsbutton.draw():
-                state = 3
+                state = 3 # Move to friends menu
 
+            # Play button
             if playbutton.draw():
                 playnow = datetime.now()
                 if playnow - quitcancelnow > timedelta(milliseconds=500):
-                    state = 4
+                    state = 4  # Move to character select menu
 
+            # Quit button
             if quitbutton.draw():
-                quitconfirm = True
+                quitconfirm = True # Enable confirmation box
 
 
 
@@ -426,23 +430,26 @@ while run:
     elif state == 2:
         drawmainmenubackground()
 
+        # Background box and title
         pygame.draw.rect(screen, black, backgroundbox)
         screen.blit(settingsmenutitle, settingsmenutitlepos)
 
+        # Back button in bottom right
         if backbutton.draw():
-            state = 1
+            state = 1 # Return to main menu
 
 
     # Friends menu
     elif state == 3:
         drawmainmenubackground()
 
+        # Background box and title
         pygame.draw.rect(screen, black, backgroundbox)
         screen.blit(friendsmenutitle, friendsmenutitlepos)
 
-
+        # Back button in bottom right
         if backbutton.draw():
-            state = 1
+            state = 1 # Return to main menu
 
 
 
@@ -485,9 +492,9 @@ while run:
 
 
 
-    # If no valid menu
+    # If no valid menu found for state variable value
     else:
-        state = 0 # Reset to login
+        state = 0 # Reset to login menu
 
 
 
@@ -497,8 +504,11 @@ while run:
 
     # Devmode displays
     if devmode:
+        # Devmode confirmation text
         devmodetext = font.render('DEVMODE', True, (255, 255, 255))
         screen.blit(devmodetext, (0, 0))
+
+        # State value display text
         statetext = font.render(str(state), True, (255, 255, 255))
         screen.blit(statetext, (0, 100))
 
@@ -521,6 +531,7 @@ while run:
 
         if devmode: # Devmode keybinds
             if event.type == pygame.KEYDOWN:
+                # Menu warps
                 if event.key == pygame.K_0:
                     state = 0
                 elif event.key == pygame.K_1:
@@ -532,6 +543,7 @@ while run:
                 elif event.key == pygame.K_4:
                     state = 4
 
+                # Quit button
                 elif event.key == pygame.K_q:
                     run = False # Quick quit game button for testing
 
