@@ -190,7 +190,10 @@ class Textbox:
         self.font = pygame.font.Font(fontname, ysize)
 
     def drawtext(self):
-        self.textsurface = self.font.render(self.displaytext, True, self.textcolour)
+        if self.displaytext != '':
+            self.textsurface = self.font.render(self.displaytext, True, self.textcolour)
+        else:
+            self.textsurface = self.font.render(self.finaltext, True, (125, 125, 125))
         screen.blit(self.textsurface, (self.x,self.y))
 
     def drawbox(self):
