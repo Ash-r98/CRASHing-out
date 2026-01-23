@@ -321,6 +321,7 @@ settingsbutton = Button(width*7/9, height/2, settingssprite, settingsspritehover
 friendsbutton = Button(width*1/7, height/2, heartsprite, heartspritehover, width/960)
 playbutton = Button(width*2/5, height*2/5, playsprite, playspritehover, width/480)
 startrunbutton = Button(width*33/40, height*2/5, playsprite, playspritehover, width/960)
+loginconfirmbutton = Button(width*2/5, height*4/5, playsprite, playspritehover, width/960)
 
 
 # Textbox Instances
@@ -387,8 +388,14 @@ while run:
         if passwordtemp != None:
             password = passwordtemp
 
-        textdisplay(username, (0, 0), 100)
-        textdisplay(password, (0, 70), 100)
+        # Draw login confirmation button
+        if username != '' and password != '':
+            if loginconfirmbutton.draw():
+                # Future account login/creation code
+                state = 1
+
+        #textdisplay(username, (0, 0), 100)
+        #textdisplay(password, (0, 70), 100)
 
 
 
