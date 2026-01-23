@@ -74,7 +74,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 fontname = 'mriamc.ttf'
 
 
-# Subroutines
+# ========== Subroutines ==========
 
 # Devmode test text display
 def textdisplay(text, pos, fontsize):
@@ -109,7 +109,7 @@ def drawmainmenubackground(): # Draws the main menu background to the screen
 
 
 
-# Classes
+# ========== Classes ==========
 
 # Button class
 class Button:
@@ -262,22 +262,52 @@ class Character:
 
 # Card Class
 class Card:
-    def __init__(self, newbasedamage, newbasedefence, neweffectlist):
-        self.basedamage = newbasedamage
+    def __init__(self, data):
+        # 0 - basedamage, 1 - basedefence, 2 - cost, 3 - effectlist
+        self.basedamage = data[0]
         self.damage = self.basedamage
-        self.basedefence = newbasedefence
+        self.basedefence = data[1]
         self.defence = self.basedefence
-        self.effectlist = neweffectlist
+        self.cost = data[2]
+        self.effectlist = data[3]
+        self.cardeffectdict = {
+            # All card special effects
+            'doublehit': False
+        }
 
 
 # Enemy Class
 class Enemy:
-    def __init__(self, newmaxhealth, newbasedamage, newspecialdamage, newadvancedai):
-        self.maxhealth = newmaxhealth
-        self.health = newmaxhealth
-        self.basedamage = newbasedamage
-        self.specialdamage = newspecialdamage
-        self.advancedai = newadvancedai # False = basic ai, True = advanced ai
+    def __init__(self, data):
+        # 0 - maxhealth, 1 - basedamage, 2 - specialdamage, 3 - defendamount, 4 - advancedai, 5 - abilitylist
+        self.maxhealth = data[0]
+        self.health = self.maxhealth
+        self.basedamage = data[1] # Attack damage can be between +20% and -20% of base
+        self.specialdamage = data[2]
+        self.defendamount = data[3]
+        self.advancedai = data[4] # False = basic ai, True = advanced ai
+        self.abilitylist = data[5]
+        self.enemyabilitydict = {
+            # All enemy abilities
+            'disguise': False
+        }
+
+
+
+# ========== Dictionaries ==========
+
+carddict = {
+    'attack': [6, 0, 1, []],
+    'defend': [0, 5, 1, []],
+    'strike': [5, 0, 0, []],
+    'heavy guard': [0, 14, 2, []],
+    'double strike': [4, 0, 1, ['doublehit']]
+}
+
+enemydict = {
+    'virus': [20, 6, 14, False, []],
+    'trojan': [40, 10, 10, False, ['disguise']]
+}
 
 
 
