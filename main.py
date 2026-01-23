@@ -260,6 +260,26 @@ class Character:
         textdisplay(self.description, (0, 100), width/30)
 
 
+# Card Class
+class Card:
+    def __init__(self, newbasedamage, newbasedefence, neweffectlist):
+        self.basedamage = newbasedamage
+        self.damage = self.basedamage
+        self.basedefence = newbasedefence
+        self.defence = self.basedefence
+        self.effectlist = neweffectlist
+
+
+# Enemy Class
+class Enemy:
+    def __init__(self, newmaxhealth, newbasedamage, newspecialdamage, newadvancedai):
+        self.maxhealth = newmaxhealth
+        self.health = newmaxhealth
+        self.basedamage = newbasedamage
+        self.specialdamage = newspecialdamage
+        self.advancedai = newadvancedai # False = basic ai, True = advanced ai
+
+
 
 # Font template: int((font size in 960:540) * (width/960))
 font = pygame.font.Font(fontname, 96)
@@ -353,6 +373,22 @@ settingsmenutitlepos = (width/20, height/20)
 # Friends Menu
 friendsmenutitle = settingstitlefont.render('Friends Menu', True, white) # Uses same font as settings
 friendsmenutitlepos = (width/20, height/20)
+
+
+# Combat Variables
+characterid = 0 # ID of selected character in character list, defaults here to 0
+character = characterlist[characterid] # Selected character set from id
+deck = []
+drawpile = []
+discardpile = []
+trashpile = []
+# Player variables
+maxhealth = 100
+health = maxhealth
+defence = 0
+hand = []
+maxhandsize = 9
+
 
 # Essential variables
 state = 0 # 0 = Login menu, 1 = Main menu
@@ -473,7 +509,9 @@ while run:
             if characterlist[i].selected:
                 characterlist[i].selectdisplay()
                 if startrunbutton.drawnobuffer():
-                    pass # Start run
+                    # Start run
+                    characterid = i
+                    state = 5
 
         for i in range(chrnum):
             x = width * ((i+1) / (chrnum+1)) - (50 * width/960)
@@ -500,6 +538,13 @@ while run:
             state = 1
 
 
+    elif state == 5: # Map Screen
+        pass
+
+
+    elif state == 6: # Combat screen
+        drawmainmenubackground()
+        textdisplay(str(characterid), (0, 0), 96)
 
 
     # If no valid menu found for state variable value
@@ -552,6 +597,10 @@ while run:
                     state = 3
                 elif event.key == pygame.K_4:
                     state = 4
+                elif event.key == pygame.K_5:
+                    state = 5
+                elif event.key == pygame.K_6:
+                    state = 6
 
                 # Quit button
                 elif event.key == pygame.K_q:
