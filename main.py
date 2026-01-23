@@ -225,7 +225,7 @@ class Textbox:
         if self.selected: # When the text box is selected
             self.drawboxselect()
 
-            for event in pygame.event.get(): # Loop for detecting key presses in pygame events
+            for event in events: # Loop for detecting key presses in pygame events
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_BACKSPACE:
                         self.displaytext = self.displaytext[:-1]
@@ -526,8 +526,8 @@ while run:
             toggledev = False # Only flips once per press
 
 
-
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    for event in events:
         # If windows X button is used
         if event.type == pygame.QUIT:
             run = False
