@@ -107,6 +107,10 @@ def drawmainmenubackground(): # Draws the main menu background to the screen
     screen.blit(mainmenubackground, (0, 0))
 
 
+def playersetup(characterid):
+    newcharacter = characterlist[characterid]
+    deck = newcharacter.startingdeck
+
 
 
 # ========== Classes ==========
@@ -241,15 +245,21 @@ class Textbox:
 
 # Character Class
 class Character:
-    def __init__(self, name, sprite, selectbutton, selectbuttonhover, startingdeck, background, description):
+    def __init__(self, name, button, sprite, startingdeck):
         self.name = name
+        self.button = button
         self.sprite = sprite
+        self.startingdeck = startingdeck
+
+
+class CharacterButton:
+    def __init__(self, name, selectbutton, selectbuttonhover, background, description):
+        self.name = name
         self.selectbutton = selectbutton
         self.selectbuttonhover = selectbuttonhover
-        self.startingdeck = startingdeck
-        self.selectbackground = pygame.transform.scale(pygame.image.load(Path(f'Sprites/{background}')), (width, height))
+        self.selectbackground = pygame.transform.scale(pygame.image.load(Path(f'Sprites/{background}')),(width, height))
         self.description = description
-        self.selected = False # True when button in select menu is clicked
+        self.selected = False  # True when button in select menu is clicked
 
     def selectbuttonclick(self):
         self.selected = not self.selected
@@ -281,7 +291,7 @@ class Card:
 # Enemy Class
 class Enemy:
     def __init__(self, data):
-        # 0 - maxhealth, 1 - basedamage, 2 - specialdamage, 3 - defendamount, 4 - advancedai, 5 - abilitylist, 6 - spritelist
+        # 0 - maxhealth, 1 - basedamage, 2 - specialdamage, 3 - defendamount, 4 - advancedai, 5 - difficulty, 6 - abilitylist, 7 - spritelist
         # Spritelist: 0 - Idle, 1 - Attack, 2 - Defend, 3 - Special
         self.maxhealth = data[0]
         self.health = self.maxhealth
@@ -289,8 +299,9 @@ class Enemy:
         self.specialdamage = data[2]
         self.defendamount = data[3]
         self.advancedai = data[4] # False = basic ai, True = advanced ai
-        self.abilitylist = data[5]
-        self.spritelist = data[6]
+        self.difficulty = data[5]
+        self.abilitylist = data[6]
+        self.spritelist = data[7]
         self.enemyabilitydict = {
             # All enemy abilities
             'disguise': False
@@ -360,8 +371,11 @@ whitesprite = pygame.image.load(Path('Sprites/white.png'))
 
 
 # Character Instances
-hero = Character('Hero', whitesprite, whitesprite, blacksprite, [], 'Matrix Background.png', 'The hero is cool')
-test = Character('test', whitesprite, whitesprite, blacksprite, [], 'xsprite.png', 'test description')
+herostarterdeck = ['attack', 'attack', 'attack', 'attack', 'defend', 'defend', 'defend', 'defend']
+herobutton = CharacterButton('Hero', whitesprite, blacksprite, 'Matrix Background.png', 'The hero is cool')
+hero = Character('Hero', herobutton, whitesprite, herostarterdeck)
+testbutton = CharacterButton('test', whitesprite, blacksprite, 'xsprite.png', 'test description')
+test = Character('test', testbutton, whitesprite, [])
 
 characterlist = [hero, test]
 
@@ -540,9 +554,12 @@ while run:
 
         # Loop to find what is already selected
         for i in range(chrnum):
-            if characterlist[i].selected:
-                characterlist[i].selectdisplay()
+            if characterlist[i].button.selected:
+                characterlist[i].button.selectdisplay()
                 if startrunbutton.drawnobuffer():
+                    # Deselect all buttons
+                    for j in range(chrnum):
+                        characterlist[j].button.selected = False
                     # Start run
                     characterid = i
                     state = 5
@@ -550,17 +567,17 @@ while run:
         for i in range(chrnum):
             x = width * ((i+1) / (chrnum+1)) - (50 * width/960)
 
-            characterbutton = Button(x, y, characterlist[i].selectbutton, characterlist[i].selectbuttonhover, width/960)
+            characterbutton = Button(x, y, characterlist[i].button.selectbutton, characterlist[i].button.selectbuttonhover, width/960)
 
             if characterbutton.drawnobuffer():
                 # Can't select until 500ms after entering menu
                 chrselectnow = datetime.now()
                 if chrselectnow - playnow > timedelta(milliseconds=500) and chrselectnow - prevchrselectnow > timedelta(milliseconds=500):
-                    characterlist[i].selectbuttonclick()
+                    characterlist[i].button.selectbuttonclick()
                     # Deselect all other buttons
                     for j in range(chrnum):
                         if j != i:
-                            characterlist[j].selected = False
+                            characterlist[j].button.selected = False
                 prevchrselectnow = datetime.now() # Sets the previous select at the end
 
 
@@ -568,7 +585,7 @@ while run:
         if backbutton.draw():
             # Deselect all characters on back button press
             for i in range(chrnum):
-                characterlist[i].selected = False
+                characterlist[i].button.selected = False
             state = 1
 
 
