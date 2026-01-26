@@ -263,13 +263,15 @@ class Character:
 # Card Class
 class Card:
     def __init__(self, data):
-        # 0 - basedamage, 1 - basedefence, 2 - cost, 3 - effectlist
+        # 0 - basedamage, 1 - basedefence, 2 - cost, 3 - effectlist, 4 - spritelist
+        # Spritelist: 0 - Idle, 1 - Attack, 2 - Defend, 3 - Special
         self.basedamage = data[0]
         self.damage = self.basedamage
         self.basedefence = data[1]
         self.defence = self.basedefence
         self.cost = data[2]
         self.effectlist = data[3]
+        self.spritelist = data[4]
         self.cardeffectdict = {
             # All card special effects
             'doublehit': False
@@ -279,7 +281,8 @@ class Card:
 # Enemy Class
 class Enemy:
     def __init__(self, data):
-        # 0 - maxhealth, 1 - basedamage, 2 - specialdamage, 3 - defendamount, 4 - advancedai, 5 - abilitylist
+        # 0 - maxhealth, 1 - basedamage, 2 - specialdamage, 3 - defendamount, 4 - advancedai, 5 - abilitylist, 6 - spritelist
+        # Spritelist: 0 - Idle, 1 - Attack, 2 - Defend, 3 - Special
         self.maxhealth = data[0]
         self.health = self.maxhealth
         self.basedamage = data[1] # Attack damage can be between +20% and -20% of base
@@ -287,6 +290,7 @@ class Enemy:
         self.defendamount = data[3]
         self.advancedai = data[4] # False = basic ai, True = advanced ai
         self.abilitylist = data[5]
+        self.spritelist = data[6]
         self.enemyabilitydict = {
             # All enemy abilities
             'disguise': False
@@ -297,16 +301,16 @@ class Enemy:
 # ========== Dictionaries ==========
 
 carddict = {
-    'attack': [6, 0, 1, []],
-    'defend': [0, 5, 1, []],
-    'strike': [5, 0, 0, []],
-    'heavy guard': [0, 14, 2, []],
-    'double strike': [4, 0, 1, ['doublehit']]
+    'attack': [6, 0, 1, [], []],
+    'defend': [0, 5, 1, [], []],
+    'strike': [5, 0, 0, [], []],
+    'heavy guard': [0, 14, 2, [], []],
+    'double strike': [4, 0, 1, ['doublehit'], []]
 }
 
 enemydict = {
-    'virus': [20, 6, 14, False, []],
-    'trojan': [40, 10, 10, False, ['disguise']]
+    'virus': [20, 6, 14, 6, False, [], []],
+    'trojan': [40, 10, 20, 10, False, ['disguise'], []]
 }
 
 
