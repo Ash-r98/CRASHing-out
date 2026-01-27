@@ -240,10 +240,11 @@ class Textbox:
 
 # Character Class
 class Character:
-    def __init__(self, name, button, sprite, startingdeck, startinghealth):
+    def __init__(self, name, button, spritelist, startingdeck, startinghealth):
+        # Spritelist: 0 - Idle, 1 - Attack, 2 - Defend, 3 - Special
         self.name = name
         self.button = button
-        self.sprite = sprite
+        self.spritelist = spritelist
         self.startingdeck = startingdeck
         self.startinghealth = startinghealth
 
@@ -269,15 +270,14 @@ class CharacterButton:
 # Card Class
 class Card:
     def __init__(self, data):
-        # 0 - basedamage, 1 - basedefence, 2 - cost, 3 - effectlist, 4 - spritelist
-        # Spritelist: 0 - Idle, 1 - Attack, 2 - Defend, 3 - Special
+        # 0 - basedamage, 1 - basedefence, 2 - cost, 3 - effectlist, 4 - sprite
         self.basedamage = data[0]
         self.damage = self.basedamage
         self.basedefence = data[1]
         self.defence = self.basedefence
         self.cost = data[2]
         self.effectlist = data[3]
-        self.spritelist = data[4]
+        self.sprite = data[4]
         self.cardeffectdict = {
             # All card special effects
             'doublehit': False
@@ -328,23 +328,6 @@ class Player:
         self.maxhandsize = 9
 
 
-# ========== Dictionaries ==========
-
-carddict = {
-    'attack': [6, 0, 1, [], []],
-    'defend': [0, 5, 1, [], []],
-    'strike': [5, 0, 0, [], []],
-    'heavy guard': [0, 14, 2, [], []],
-    'double strike': [4, 0, 1, ['doublehit'], []]
-}
-
-enemydict = {
-    'virus': [20, 6, 14, 6, False, [], []],
-    'trojan': [40, 10, 20, 10, False, ['disguise'], []]
-}
-
-
-
 # Font template: int((font size in 960:540) * (width/960))
 font = pygame.font.Font(fontname, 96)
 
@@ -387,6 +370,24 @@ heartsprite = pygame.image.load(Path('Sprites/heartsprite.png'))
 heartspritehover = pygame.image.load(Path('Sprites/heartspritehover.png'))
 blacksprite = pygame.image.load(Path('Sprites/black.png'))
 whitesprite = pygame.image.load(Path('Sprites/white.png'))
+card = pygame.image.load(Path('Cards/cardbackground.png'))
+attackcardsprite = pygame.image.load(Path('Cards/attackcard.png'))
+
+
+# ========== Dictionaries ==========
+
+carddict = {
+    'attack': [6, 0, 1, [], attackcardsprite],
+    'defend': [0, 5, 1, [], card],
+    'strike': [5, 0, 0, [], card],
+    'heavy guard': [0, 14, 2, [], card],
+    'double strike': [4, 0, 1, ['doublehit'], card]
+}
+
+enemydict = {
+    'virus': [20, 6, 14, 6, False, [], []],
+    'trojan': [40, 10, 20, 10, False, ['disguise'], []]
+}
 
 
 # Character Instances
