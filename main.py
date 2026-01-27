@@ -270,14 +270,15 @@ class CharacterButton:
 # Card Class
 class Card:
     def __init__(self, data):
-        # 0 - basedamage, 1 - basedefence, 2 - cost, 3 - effectlist, 4 - sprite
-        self.basedamage = data[0]
+        # 0 - name, 1 - basedamage, 2 - basedefence, 3 - cost, 4 - effectlist, 5 - sprite
+        self.name = data[0]
+        self.basedamage = data[1]
         self.damage = self.basedamage
-        self.basedefence = data[1]
+        self.basedefence = data[2]
         self.defence = self.basedefence
-        self.cost = data[2]
-        self.effectlist = data[3]
-        self.sprite = data[4]
+        self.cost = data[3]
+        self.effectlist = data[4]
+        self.sprite = data[5]
         self.cardeffectdict = {
             # All card special effects
             'doublehit': False
@@ -287,17 +288,18 @@ class Card:
 # Enemy Class
 class Enemy:
     def __init__(self, data):
-        # 0 - maxhealth, 1 - basedamage, 2 - specialdamage, 3 - defendamount, 4 - advancedai, 5 - difficulty, 6 - abilitylist, 7 - spritelist
+        # 0 - name, 1 - maxhealth, 2 - basedamage, 3 - specialdamage, 4 - defendamount, 5 - advancedai, 6 - difficulty, 7 - abilitylist, 8 - spritelist
         # Spritelist: 0 - Idle, 1 - Attack, 2 - Defend, 3 - Special
-        self.maxhealth = data[0]
+        self.name = data[0]
+        self.maxhealth = data[1]
         self.health = self.maxhealth
-        self.basedamage = data[1] # Attack damage can be between +20% and -20% of base
-        self.specialdamage = data[2]
-        self.defendamount = data[3]
-        self.advancedai = data[4] # False = basic ai, True = advanced ai
-        self.difficulty = data[5]
-        self.abilitylist = data[6]
-        self.spritelist = data[7]
+        self.basedamage = data[2] # Attack damage can be between +20% and -20% of base
+        self.specialdamage = data[3]
+        self.defendamount = data[4]
+        self.advancedai = data[5] # False = basic ai, True = advanced ai
+        self.difficulty = data[6]
+        self.abilitylist = data[7]
+        self.spritelist = data[8]
         self.enemyabilitydict = {
             # All enemy abilities
             'disguise': False
@@ -377,11 +379,11 @@ attackcardsprite = pygame.image.load(Path('Cards/attackcard.png'))
 # ========== Dictionaries ==========
 
 carddict = {
-    'attack': [6, 0, 1, [], attackcardsprite],
-    'defend': [0, 5, 1, [], card],
-    'strike': [5, 0, 0, [], card],
-    'heavy guard': [0, 14, 2, [], card],
-    'double strike': [4, 0, 1, ['doublehit'], card]
+    'attack': ['attack', 6, 0, 1, [], attackcardsprite],
+    'defend': ['defend', 0, 5, 1, [], card],
+    'strike': ['strike', 5, 0, 0, [], card],
+    'heavy guard': ['heavy guard', 0, 14, 2, [], card],
+    'double strike': ['double strike', 4, 0, 1, ['doublehit'], card]
 }
 
 enemydict = {
