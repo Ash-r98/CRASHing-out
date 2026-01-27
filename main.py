@@ -316,10 +316,16 @@ class Player:
         self.character = None
 
     def startrun(self, newcharacter):
+        # Character variables
         self.character = newcharacter
         self.deck = self.character.startingdeck
         self.maxhealth = self.character.startinghealth
+
+        # Other variables reset for backup
+        self.hand = []
         self.health = self.maxhealth
+        self.defence = 0
+        self.maxhandsize = 9
 
 
 # ========== Dictionaries ==========
