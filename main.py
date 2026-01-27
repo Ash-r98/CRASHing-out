@@ -107,6 +107,30 @@ def drawmainmenubackground(): # Draws the main menu background to the screen
     screen.blit(mainmenubackground, (0, 0))
 
 
+def renderhand(hand): # Pass in player hand as a parameter
+    # Return: returns None, if card is clicked then return index of card in hand
+    for i in range(len(hand)):
+        card = Card(carddict[hand[i]])
+        size = 1
+
+        if len(hand) > 5:
+            size = 1
+        else:
+            size = 1.5
+        scale = width/960 * size
+
+        offset = width / (len(hand) + 1)
+        x = offset * (i+1) - 45*scale
+        y = 0
+        y = height * 21/40
+        cardbutton = Button(x, y, card.sprite, card.sprite, scale)
+        if ishover(cardbutton.rect):
+            hoverscale = 1.2
+            cardbutton = Button(x-90*(hoverscale-1)/2, y-160*(hoverscale-1)/2, card.sprite, card.sprite, scale*hoverscale)
+        if cardbutton.drawnobuffer():
+            textdisplay('YAY', (100, 100), 100)
+
+
 
 # ========== Classes ==========
 
@@ -624,6 +648,13 @@ while run:
         drawmainmenubackground()
         textdisplay(character.name, (0, 0), 96)
 
+        # Initial combat setup
+        if drawpile == [] and discardpile == [] and player.hand == []:
+            drawpile = player.deck
+
+        renderhand(player.hand)
+
+
 
     # If no valid menu found for state variable value
     else:
@@ -679,6 +710,9 @@ while run:
                     state = 5
                 elif event.key == pygame.K_6:
                     state = 6
+
+                elif event.key == pygame.K_SPACE:
+                    player.hand.append('attack')
 
                 # Quit button
                 elif event.key == pygame.K_q:
