@@ -374,13 +374,14 @@ blacksprite = pygame.image.load(Path('Sprites/black.png'))
 whitesprite = pygame.image.load(Path('Sprites/white.png'))
 card = pygame.image.load(Path('Cards/cardbackground.png'))
 attackcardsprite = pygame.image.load(Path('Cards/attackcard.png'))
+defendcardsprite = pygame.image.load(Path('Cards/defendcard.png'))
 
 
 # ========== Dictionaries ==========
 
 carddict = {
     'attack': ['attack', 6, 0, 1, [], attackcardsprite],
-    'defend': ['defend', 0, 5, 1, [], card],
+    'defend': ['defend', 0, 5, 1, [], defendcardsprite],
     'strike': ['strike', 5, 0, 0, [], card],
     'heavy guard': ['heavy guard', 0, 14, 2, [], card],
     'double strike': ['double strike', 4, 0, 1, ['doublehit'], card]
