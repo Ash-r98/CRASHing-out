@@ -107,11 +107,6 @@ def drawmainmenubackground(): # Draws the main menu background to the screen
     screen.blit(mainmenubackground, (0, 0))
 
 
-def playersetup(characterid):
-    newcharacter = characterlist[characterid]
-    deck = newcharacter.startingdeck
-
-
 
 # ========== Classes ==========
 
@@ -245,11 +240,12 @@ class Textbox:
 
 # Character Class
 class Character:
-    def __init__(self, name, button, sprite, startingdeck):
+    def __init__(self, name, button, sprite, startingdeck, startinghealth):
         self.name = name
         self.button = button
         self.sprite = sprite
         self.startingdeck = startingdeck
+        self.startinghealth = startinghealth
 
 
 class CharacterButton:
@@ -307,6 +303,23 @@ class Enemy:
             'disguise': False
         }
 
+
+# Player Class
+class Player:
+    def __init__(self):
+        self.deck = []
+        self.hand = []
+        self.maxhealth = 100
+        self.health = self.maxhealth
+        self.defence = 0
+        self.maxhandsize = 9
+        self.character = None
+
+    def startrun(self, newcharacter):
+        self.character = newcharacter
+        self.deck = self.character.startingdeck
+        self.maxhealth = self.character.startinghealth
+        self.health = self.maxhealth
 
 
 # ========== Dictionaries ==========
@@ -373,9 +386,9 @@ whitesprite = pygame.image.load(Path('Sprites/white.png'))
 # Character Instances
 herostarterdeck = ['attack', 'attack', 'attack', 'attack', 'defend', 'defend', 'defend', 'defend']
 herobutton = CharacterButton('Hero', whitesprite, blacksprite, 'Matrix Background.png', 'The hero is cool')
-hero = Character('Hero', herobutton, whitesprite, herostarterdeck)
+hero = Character('Hero', herobutton, whitesprite, herostarterdeck, 100)
 testbutton = CharacterButton('test', whitesprite, blacksprite, 'xsprite.png', 'test description')
-test = Character('test', testbutton, whitesprite, [])
+test = Character('test', testbutton, whitesprite, [], 999)
 
 characterlist = [hero, test]
 
@@ -423,19 +436,14 @@ friendsmenutitle = settingstitlefont.render('Friends Menu', True, white) # Uses 
 friendsmenutitlepos = (width/20, height/20)
 
 
-# Combat Variables
-characterid = 0 # ID of selected character in character list, defaults here to 0
-character = characterlist[characterid] # Selected character set from id
-deck = []
+# Combat Variables, will copy cards from player object deck attribute
 drawpile = []
 discardpile = []
 trashpile = []
-# Player variables
-maxhealth = 100
-health = maxhealth
-defence = 0
-hand = []
-maxhandsize = 9
+character = None # Backup if run is entered without setting a character
+
+# Player object
+player = Player()
 
 
 # Essential variables
@@ -561,7 +569,8 @@ while run:
                     for j in range(chrnum):
                         characterlist[j].button.selected = False
                     # Start run
-                    characterid = i
+                    character = characterlist[i]
+                    player.startrun(character)
                     state = 5
 
         for i in range(chrnum):
@@ -590,12 +599,20 @@ while run:
 
 
     elif state == 5: # Map Screen
-        pass
+        # Backup in case player has no character
+        if character == None:
+            character = characterlist[0]
+            player.startrun(character)
 
 
     elif state == 6: # Combat screen
+        # Backup in case player has no character
+        if character == None:
+            character = characterlist[0]
+            player.startrun(character)
+
         drawmainmenubackground()
-        textdisplay(str(characterid), (0, 0), 96)
+        textdisplay(character.name, (0, 0), 96)
 
 
     # If no valid menu found for state variable value
