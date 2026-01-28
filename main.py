@@ -109,26 +109,33 @@ def drawmainmenubackground(): # Draws the main menu background to the screen
 
 def renderhand(hand): # Pass in player hand as a parameter
     # Return: returns None, if card is clicked then return index of card in hand
+
+    hoverflag = False # Checks if a card is already being hovered over (only one card can be hovered at a time)
     for i in range(len(hand)):
         card = Card(carddict[hand[i]])
         size = 1
 
-        if len(hand) > 5:
+        if len(hand) > 5: # If large hand, small cards
             size = 1
-        else:
+        else: # If small hand, large cards
             size = 1.5
         scale = width/960 * size
 
-        offset = width / (len(hand) + 1)
-        x = offset * (i+1) - 45*scale
-        y = 0
-        y = height * 21/40
-        cardbutton = Button(x, y, card.sprite, card.sprite, scale)
-        if ishover(cardbutton.rect):
-            hoverscale = 1.2
-            cardbutton = Button(x-90*(hoverscale-1)/2, y-160*(hoverscale-1)/2, card.sprite, card.sprite, scale*hoverscale)
+        offset = width / (len(hand) + 1) # Position of the card evenly spaced on the screen
+        centercorrection = width/60 * (i - (len(hand)-1)/2) # Groups the cards closer together
+        x = (offset * (i+1)) - centercorrection - 45*scale # Final x position
+        y = height * 21/40 # Final y position
+        cardbutton = Button(x, y, card.sprite, card.sprite, scale) # Creates initial button
+        if ishover(cardbutton.rect): # If card sprite is hovered over by user
+            hoverscale = 1.2 # Scale value of hovered cards, provides visual feedback to the user of selected card
+            if not hoverflag: # If there is no card already being hovered over
+                hoverflag = True # Sets the flag as this will be the only card that can hovered over in this loop
+                # Draws larger card button
+                cardbutton = Button(x-90*(hoverscale-1)/2, y-160*(hoverscale-1)/2, card.sprite, card.sprite, scale*hoverscale)
+
+        # If card is clicked
         if cardbutton.drawnobuffer():
-            textdisplay('YAY', (100, 100), 100)
+            textdisplay('YAY', (100, 100), 100) # Test text to confirm card clicking
 
 
 
