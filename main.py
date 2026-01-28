@@ -142,6 +142,15 @@ def renderhand(hand): # Pass in player hand as a parameter
     return returnvar
 
 
+def draw(amount, drawpile, discardpile):
+    for i in range(amount):
+        if len(drawpile) <= 0:
+            drawpile = discardpile
+            drawpile.shuffle()
+        player.hand.append(drawpile.pop())
+    return drawpile, discardpile
+
+
 
 # ========== Classes ==========
 
@@ -353,6 +362,7 @@ class Player:
         self.energy = self.maxenergy
         self.maxhandsize = 9
         self.character = None
+        self.incombat = False
 
     def startrun(self, newcharacter):
         # Character variables
@@ -367,6 +377,7 @@ class Player:
         self.maxenergy = 3
         self.energy = self.maxenergy
         self.maxhandsize = 9
+        self.incombat = False
 
 
 # Font template: int((font size in 960:540) * (width/960))
@@ -663,8 +674,12 @@ while run:
         textdisplay(character.name, (0, 0), 96)
 
         # Initial combat setup
-        if drawpile == [] and discardpile == [] and player.hand == []:
+        if not player.incombat:
             drawpile = player.deck
+            discardpile = []
+            trashpile = []
+            player.incombat = True # Will only run once per combat
+            drawpile, discardpile = draw(5, drawpile, discardpile)
 
         renderhand(player.hand)
 
