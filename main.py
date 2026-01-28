@@ -119,7 +119,7 @@ def renderhand(hand): # Pass in player hand as a parameter
         if len(hand) > 5: # If large hand, small cards
             size = 1
         else: # If small hand, large cards
-            size = 1.5
+            size = 1.3
         scale = width/960 * size
 
         offset = width / (len(hand) + 1) # Position of the card evenly spaced on the screen
@@ -349,6 +349,8 @@ class Player:
         self.maxhealth = 100
         self.health = self.maxhealth
         self.defence = 0
+        self.maxenergy = 3
+        self.energy = self.maxenergy
         self.maxhandsize = 9
         self.character = None
 
@@ -362,6 +364,8 @@ class Player:
         self.hand = []
         self.health = self.maxhealth
         self.defence = 0
+        self.maxenergy = 3
+        self.energy = self.maxenergy
         self.maxhandsize = 9
 
 
@@ -656,7 +660,6 @@ while run:
             character = characterlist[0]
             player.startrun(character)
 
-        drawmainmenubackground()
         textdisplay(character.name, (0, 0), 96)
 
         # Initial combat setup
@@ -722,8 +725,12 @@ while run:
                 elif event.key == pygame.K_6:
                     state = 6
 
-                elif event.key == pygame.K_SPACE:
+                elif event.key == pygame.K_o:
                     player.hand.append('attack')
+                elif event.key == pygame.K_p:
+                    player.hand.append('defend')
+                elif event.key == pygame.K_i:
+                    player.hand = []
 
                 # Quit button
                 elif event.key == pygame.K_q:
