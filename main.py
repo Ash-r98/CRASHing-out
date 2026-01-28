@@ -109,6 +109,7 @@ def drawmainmenubackground(): # Draws the main menu background to the screen
 
 def renderhand(hand): # Pass in player hand as a parameter
     # Return: returns None, if card is clicked then return index of card in hand
+    returnvar = None
 
     hoverflag = False # Checks if a card is already being hovered over (only one card can be hovered at a time)
     for i in range(len(hand)):
@@ -135,7 +136,10 @@ def renderhand(hand): # Pass in player hand as a parameter
 
         # If card is clicked
         if cardbutton.drawnobuffer():
+            returnvar = i
             textdisplay('YAY', (100, 100), 100) # Test text to confirm card clicking
+
+    return returnvar
 
 
 
