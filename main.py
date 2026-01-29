@@ -1,7 +1,7 @@
 import pygame
 from pathlib import Path
 from time import sleep
-from random import randint
+from random import randint, shuffle
 from datetime import datetime, timedelta
 
 pygame.init()
@@ -140,15 +140,6 @@ def renderhand(hand): # Pass in player hand as a parameter
             textdisplay('YAY', (100, 100), 100) # Test text to confirm card clicking
 
     return returnvar
-
-
-def draw(amount, drawpile, discardpile):
-    for i in range(amount):
-        if len(drawpile) <= 0:
-            drawpile = discardpile
-            drawpile.shuffle()
-        player.hand.append(drawpile.pop())
-    return drawpile, discardpile
 
 
 
@@ -354,6 +345,9 @@ class Enemy:
 class Player:
     def __init__(self):
         self.deck = []
+        self.drawpile = []
+        self.discardpile = []
+        self.trashpile = []
         self.hand = []
         self.maxhealth = 100
         self.health = self.maxhealth
@@ -371,6 +365,9 @@ class Player:
         self.maxhealth = self.character.startinghealth
 
         # Other variables reset for backup
+        self.drawpile = []
+        self.discardpile = []
+        self.trashpile = []
         self.hand = []
         self.health = self.maxhealth
         self.defence = 0
@@ -378,6 +375,15 @@ class Player:
         self.energy = self.maxenergy
         self.maxhandsize = 9
         self.incombat = False
+
+    def draw(self, amount):
+        for i in range(amount):
+            if len(self.drawpile) <= 0:
+                self.drawpile = self.discardpile
+                self.discardpile = []
+                shuffle(self.drawpile)
+            if len(self.drawpile) > 0:  # Draw pile may still be empty after an attempted shuffle
+                self.hand.append(self.drawpile.pop())
 
 
 # Font template: int((font size in 960:540) * (width/960))
@@ -495,12 +501,6 @@ settingsmenutitlepos = (width/20, height/20)
 friendsmenutitle = settingstitlefont.render('Friends Menu', True, white) # Uses same font as settings
 friendsmenutitlepos = (width/20, height/20)
 
-
-# Combat Variables, will copy cards from player object deck attribute
-drawpile = []
-discardpile = []
-trashpile = []
-character = None # Backup if run is entered without setting a character
 
 # Player object
 player = Player()
@@ -676,10 +676,12 @@ while run:
         # Initial combat setup
         if not player.incombat:
             drawpile = player.deck
+            shuffle(drawpile)
             discardpile = []
             trashpile = []
             player.incombat = True # Will only run once per combat
-            drawpile, discardpile = draw(5, drawpile, discardpile)
+
+
 
         renderhand(player.hand)
 
@@ -746,6 +748,8 @@ while run:
                     player.hand.append('defend')
                 elif event.key == pygame.K_i:
                     player.hand = []
+                elif event.key == pygame.K_SPACE:
+                    player.draw(1)
 
                 # Quit button
                 elif event.key == pygame.K_q:
