@@ -137,7 +137,7 @@ def renderhand(hand): # Pass in player hand as a parameter
         # If card is clicked
         if cardbutton.drawnobuffer():
             returnvar = i
-            textdisplay('YAY', (100, 100), 100) # Test text to confirm card clicking
+            #textdisplay('YAY', (100, 100), 100) # Test text to confirm card clicking
 
     return returnvar
 
@@ -325,6 +325,8 @@ class Card:
     def play(self, handindex):
         # Remove card from player hand
         card = player.hand.pop(handindex)
+
+        # Card effects
 
         # Discard card
         if not 'selfdelete' in self.effectlist:
@@ -698,14 +700,16 @@ while run:
             player.draw(1)
 
         textdisplay(f'{player.health}/{player.maxhealth}', (0, 0), 100)
-        print(player.hand, player.drawpile, player.discardpile)
+        textdisplay(f'{player.energy}/{player.maxenergy}', (0, 100), 100)
 
         playedcardindex = renderhand(player.hand)
         if playedcardindex != None:
             playedcardnow = datetime.now()
-            if playedcardnow - prevplayedcardnow > timedelta(milliseconds=1000):
-                playedcard = Card(player.hand[playedcardindex])
-                playedcard.play(playedcardindex)
+            if playedcardnow - prevplayedcardnow > timedelta(milliseconds=500):
+                playedcard = Card(carddict[player.hand[playedcardindex]])
+                if playedcard.cost <= player.energy:
+                    playedcard.play(playedcardindex)
+                    player.energy -= playedcard.cost
             prevplayedcardnow = playedcardnow
 
 
