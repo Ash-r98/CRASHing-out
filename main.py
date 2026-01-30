@@ -324,14 +324,13 @@ class Card:
 
     def play(self, handindex):
         # Remove card from player hand
-        player.hand.pop(handindex)
-        print(self.name)
+        card = player.hand.pop(handindex)
 
         # Discard card
         if not 'selfdelete' in self.effectlist:
-            player.discardpile.append(self.name)
+            player.discardpile.append(card)
         else: # Trash card
-            player.trashpile.append(self.name)
+            player.trashpile.append(card)
 
 
 # Enemy Class
