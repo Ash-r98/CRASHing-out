@@ -316,8 +316,22 @@ class Card:
         self.sprite = data[5]
         self.cardeffectdict = {
             # All card special effects
+            'selfdelete': False,
             'doublehit': False
         }
+        for i in range(len(self.effectlist)):
+            self.cardeffectdict[self.effectlist[i]] = True
+
+    def play(self, handindex):
+        # Remove card from player hand
+        player.hand.pop(handindex)
+        print(self.name)
+
+        # Discard card
+        if not 'selfdelete' in self.effectlist:
+            player.discardpile.append(self.name)
+        else: # Trash card
+            player.trashpile.append(self.name)
 
 
 # Enemy Class
@@ -440,7 +454,8 @@ carddict = {
     'defend': ['defend', 0, 5, 1, [], defendcardsprite],
     'strike': ['strike', 5, 0, 0, [], card],
     'heavy guard': ['heavy guard', 0, 14, 2, [], card],
-    'double strike': ['double strike', 4, 0, 1, ['doublehit'], card]
+    'double strike': ['double strike', 4, 0, 1, ['doublehit'], card],
+    'volatile strike': ['volatile strike', 22, 0, 2, ['self-delete'], card]
 }
 
 enemydict = {
@@ -501,6 +516,8 @@ settingsmenutitlepos = (width/20, height/20)
 friendsmenutitle = settingstitlefont.render('Friends Menu', True, white) # Uses same font as settings
 friendsmenutitlepos = (width/20, height/20)
 
+# Character backup variable
+character = None
 
 # Player object
 player = Player()
@@ -515,6 +532,7 @@ quitcancelnow = datetime.now()
 playnow = datetime.now()
 chrselectnow = datetime.now()
 prevchrselectnow = datetime.now()
+prevplayedcardnow = datetime.now()
 
 # Devmode variables
 toggledev = False
@@ -671,19 +689,25 @@ while run:
             character = characterlist[0]
             player.startrun(character)
 
-        textdisplay(character.name, (0, 0), 96)
-
         # Initial combat setup
         if not player.incombat:
-            drawpile = player.deck
-            shuffle(drawpile)
-            discardpile = []
-            trashpile = []
+            player.drawpile = player.deck
+            shuffle(player.drawpile)
+            player.discardpile = []
+            player.trashpile = []
             player.incombat = True # Will only run once per combat
+            player.draw(1)
 
+        textdisplay(f'{player.health}/{player.maxhealth}', (0, 0), 100)
+        print(player.hand, player.drawpile, player.discardpile)
 
-
-        renderhand(player.hand)
+        playedcardindex = renderhand(player.hand)
+        if playedcardindex != None:
+            playedcardnow = datetime.now()
+            if playedcardnow - prevplayedcardnow > timedelta(milliseconds=1000):
+                playedcard = Card(player.hand[playedcardindex])
+                playedcard.play(playedcardindex)
+            prevplayedcardnow = playedcardnow
 
 
 
