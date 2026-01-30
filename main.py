@@ -443,7 +443,7 @@ heartsprite = pygame.image.load(Path('Sprites/heartsprite.png'))
 heartspritehover = pygame.image.load(Path('Sprites/heartspritehover.png'))
 blacksprite = pygame.image.load(Path('Sprites/black.png'))
 whitesprite = pygame.image.load(Path('Sprites/white.png'))
-card = pygame.image.load(Path('Cards/cardbackground.png'))
+cardsprite = pygame.image.load(Path('Cards/cardbackground.png'))
 attackcardsprite = pygame.image.load(Path('Cards/attackcard.png'))
 defendcardsprite = pygame.image.load(Path('Cards/defendcard.png'))
 
@@ -453,10 +453,10 @@ defendcardsprite = pygame.image.load(Path('Cards/defendcard.png'))
 carddict = {
     'attack': ['attack', 6, 0, 1, [], attackcardsprite],
     'defend': ['defend', 0, 5, 1, [], defendcardsprite],
-    'strike': ['strike', 5, 0, 0, [], card],
-    'heavy guard': ['heavy guard', 0, 14, 2, [], card],
-    'double strike': ['double strike', 4, 0, 1, ['doublehit'], card],
-    'volatile strike': ['volatile strike', 22, 0, 2, ['self-delete'], card]
+    'strike': ['strike', 5, 0, 0, [], cardsprite],
+    'heavy guard': ['heavy guard', 0, 14, 2, [], cardsprite],
+    'double strike': ['double strike', 4, 0, 1, ['doublehit'], cardsprite],
+    'volatile strike': ['volatile strike', 22, 0, 2, ['self-delete'], cardsprite]
 }
 
 enemydict = {
@@ -485,6 +485,10 @@ friendsbutton = Button(width*1/7, height/2, heartsprite, heartspritehover, width
 playbutton = Button(width*2/5, height*2/5, playsprite, playspritehover, width/480)
 startrunbutton = Button(width*33/40, height*2/5, playsprite, playspritehover, width/960)
 loginconfirmbutton = Button(width*2/5, height*4/5, playsprite, playspritehover, width/960)
+viewdeckbutton = Button(width*9/10, height*1/10, cardsprite, attackcardsprite, width/1920)
+viewdrawpilebutton = Button(width*1/20, height*7/10, cardsprite, attackcardsprite, width/1920)
+viewdiscardpilebutton = Button(width*18/20, height*7/10, cardsprite, attackcardsprite, width/1920)
+viewtrashpilebutton = Button(width*17/20, height*8/10, cardsprite, attackcardsprite, width/1920)
 
 
 # Textbox Instances
@@ -516,6 +520,17 @@ settingsmenutitlepos = (width/20, height/20)
 # Friends Menu
 friendsmenutitle = settingstitlefont.render('Friends Menu', True, white) # Uses same font as settings
 friendsmenutitlepos = (width/20, height/20)
+
+# Deck View Menus
+fulldeckmenutitle = settingstitlefont.render('Full Deck', True, white)
+fulldeckmenutitlepos = (width/50, height/50)
+drawpilemenutitle = settingstitlefont.render('Draw Pile', True, white)
+drawpilemenutitlepos = (width/50, height/50)
+discardpilemenutitle = settingstitlefont.render('Discard Pile', True, white)
+discardpilemenutitlepos = (width/50, height/50)
+trashpilemenutitle = settingstitlefont.render('Trash Pile', True, white)
+trashpilemenutitlepos = (width/50, height/50)
+
 
 # Character backup variable
 character = None
@@ -702,6 +717,16 @@ while run:
         textdisplay(f'{player.health}/{player.maxhealth}', (0, 0), 100)
         textdisplay(f'{player.energy}/{player.maxenergy}', (0, 100), 100)
 
+        # Buttons
+        if viewdeckbutton.draw():
+            state = 7
+        if viewdrawpilebutton.draw():
+            state = 8
+        if viewdiscardpilebutton.draw():
+            state = 9
+        if viewtrashpilebutton.draw():
+            state = 10
+
         playedcardindex = renderhand(player.hand)
         if playedcardindex != None:
             playedcardnow = datetime.now()
@@ -711,6 +736,28 @@ while run:
                     playedcard.play(playedcardindex)
                     player.energy -= playedcard.cost
             prevplayedcardnow = playedcardnow
+
+
+
+    elif state == 7: # View full deck
+        # Title text
+        screen.blit(fulldeckmenutitle, fulldeckmenutitlepos)
+
+
+    elif state == 8: # View draw pile
+        # Title text
+        screen.blit(drawpilemenutitle, drawpilemenutitlepos)
+
+
+    elif state == 9: # View discard pile
+        # Title text
+        screen.blit(discardpilemenutitle, discardpilemenutitlepos)
+
+
+    elif state == 10: # View trash pile
+        # Title text
+        screen.blit(trashpilemenutitle, trashpilemenutitlepos)
+
 
 
 
@@ -768,6 +815,14 @@ while run:
                     state = 5
                 elif event.key == pygame.K_6:
                     state = 6
+                elif event.key == pygame.K_7:
+                    state = 7
+                elif event.key == pygame.K_8:
+                    state = 8
+                elif event.key == pygame.K_9:
+                    state = 9
+                elif event.key == pygame.K_q:
+                    state = 10
 
                 elif event.key == pygame.K_o:
                     player.hand.append('attack')
