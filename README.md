@@ -6,3 +6,8 @@ This will be updated slowly over time, and should be finished in early January o
 # Details
 
 This is a game heavily inspired by Slay the Spire but with a new technological visual style
+
+# Current Progress
+
+Iteration 1: Complete
+Iteration 2: ~30% done
