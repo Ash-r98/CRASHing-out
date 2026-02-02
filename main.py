@@ -142,6 +142,31 @@ def renderhand(hand): # Pass in player hand as a parameter
     return returnvar
 
 
+def displaycardpile(pile):
+    if len(pile) <= 0: # If pile is empty
+        return None
+
+    rownum = (len(pile) // 10) + 1
+    cardsperrow = len(pile) // rownum
+    cardsonlastrow = len(pile) % cardsperrow
+    if cardsonlastrow != 0:
+        cardsperrow += 1
+    scale = 1 / (rownum // 4 + 1)
+
+    for i in range(rownum):
+        y = (height / (rownum+1)) * (rownum - i) - 80*scale
+        if i != rownum - 1 or cardsonlastrow == 0: # Not last row or last row is identical
+            cardsinrow = cardsperrow
+        else: # Last row
+            cardsinrow = cardsonlastrow
+        for j in range(cardsinrow):
+            index = (cardsinrow*i) + j
+            x = (width / (cardsinrow+1)) * (j + 1) - 45*scale
+            card = Card(carddict[pile[index]])
+            cardbutton = Button(x, y, card.sprite, card.sprite, scale)
+            cardbutton.draw()
+
+
 
 # ========== Classes ==========
 
@@ -707,7 +732,7 @@ while run:
 
         # Initial combat setup
         if not player.incombat:
-            player.drawpile = player.deck
+            player.drawpile = player.deck[:]
             shuffle(player.drawpile)
             player.discardpile = []
             player.trashpile = []
@@ -743,20 +768,28 @@ while run:
         # Title text
         screen.blit(fulldeckmenutitle, fulldeckmenutitlepos)
 
+        displaycardpile(player.deck)
+
 
     elif state == 8: # View draw pile
         # Title text
         screen.blit(drawpilemenutitle, drawpilemenutitlepos)
+
+        displaycardpile(player.drawpile)
 
 
     elif state == 9: # View discard pile
         # Title text
         screen.blit(discardpilemenutitle, discardpilemenutitlepos)
 
+        displaycardpile(player.discardpile)
+
 
     elif state == 10: # View trash pile
         # Title text
         screen.blit(trashpilemenutitle, trashpilemenutitlepos)
+
+        displaycardpile(player.trashpile)
 
 
 
@@ -821,13 +854,13 @@ while run:
                     state = 8
                 elif event.key == pygame.K_9:
                     state = 9
-                elif event.key == pygame.K_q:
+                elif event.key == pygame.K_w:
                     state = 10
 
                 elif event.key == pygame.K_o:
-                    player.hand.append('attack')
+                    player.deck.append('attack')
                 elif event.key == pygame.K_p:
-                    player.hand.append('defend')
+                    player.deck.append('defend')
                 elif event.key == pygame.K_i:
                     player.hand = []
                 elif event.key == pygame.K_SPACE:
