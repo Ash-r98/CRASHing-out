@@ -151,10 +151,11 @@ def displaycardpile(pile):
     cardsonlastrow = len(pile) % cardsperrow
     if cardsonlastrow != 0:
         cardsperrow += 1
+        cardsonlastrow = len(pile) % cardsperrow
     scale = 1 / (rownum // 4 + 1)
 
     for i in range(rownum):
-        y = (height / (rownum+1)) * (rownum - i) - 80*scale
+        y = (height / (rownum+1)) * (i + 1) - 80*scale
         if i != rownum - 1 or cardsonlastrow == 0: # Not last row or last row is identical
             cardsinrow = cardsperrow
         else: # Last row
