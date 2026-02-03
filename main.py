@@ -381,8 +381,8 @@ class Enemy:
             'disguise': False
         }
 
-    def render(self): # Draws enemy sprite to screen
-        screen.blit(self.spritelist[0], (width/4, height/4))
+    def render(self): # Draws enemy sprite to screen during combat
+        screen.blit(self.spritelist[0], (width*5/16, height*1/8))
 
 
 # Player Class
@@ -401,12 +401,14 @@ class Player:
         self.maxhandsize = 9
         self.character = None
         self.incombat = False
+        self.spritelist = []
 
     def startrun(self, newcharacter):
         # Character variables
         self.character = newcharacter
         self.deck = self.character.startingdeck
         self.maxhealth = self.character.startinghealth
+        self.spritelist = self.character.spritelist
 
         # Other variables reset for backup
         self.drawpile = []
@@ -419,6 +421,9 @@ class Player:
         self.energy = self.maxenergy
         self.maxhandsize = 9
         self.incombat = False
+
+    def render(self): # Draw player sprite to screen during combat
+        screen.blit(self.spritelist[0], (width*1/16, height*1/8))
 
     def draw(self, amount):
         for i in range(amount):
@@ -499,7 +504,7 @@ enemydict = {
 # Character Instances
 herostarterdeck = ['attack', 'attack', 'attack', 'attack', 'defend', 'defend', 'defend', 'defend']
 herobutton = CharacterButton('Hero', whitesprite, blacksprite, 'Matrix Background.png', 'The hero is cool')
-hero = Character('Hero', herobutton, whitesprite, herostarterdeck, 100)
+hero = Character('Hero', herobutton, [whitesprite, whitesprite, whitesprite, whitesprite], herostarterdeck, 100)
 testbutton = CharacterButton('test', whitesprite, blacksprite, 'xsprite.png', 'test description')
 test = Character('test', testbutton, whitesprite, [], 999)
 
@@ -552,6 +557,9 @@ settingsmenutitlepos = (width/20, height/20)
 friendsmenutitle = settingstitlefont.render('Friends Menu', True, white) # Uses same font as settings
 friendsmenutitlepos = (width/20, height/20)
 
+# Combat Menu
+infobox = pygame.Rect((width*11/20, 0), (width*9/20, height*9/20))
+
 # Deck View Menus
 fulldeckmenutitle = settingstitlefont.render('Full Deck', True, white)
 fulldeckmenutitlepos = (width/50, height/50)
@@ -565,6 +573,7 @@ trashpilemenutitlepos = (width/50, height/50)
 
 # Combat variables
 currentenemy = 'virus'
+enemy = ''
 nextreward = ''
 
 
@@ -749,13 +758,22 @@ while run:
             player.trashpile = []
             player.incombat = True # Will only run once per combat
             player.draw(1)
+            # Enemy instantiation
+            enemy = Enemy(enemydict[currentenemy])
 
-        textdisplay(f'{player.health}/{player.maxhealth}', (0, 0), 100)
-        textdisplay(f'{player.energy}/{player.maxenergy}', (0, 100), 100)
+        # Info box
+        pygame.draw.rect(screen, darkgrey, infobox)
 
-        # Enemy display
-        enemy = Enemy(enemydict[currentenemy])
+        # Player and enemy display
+        player.render()
         enemy.render()
+
+        # Info box information
+        textdisplay(f'Player hp:', (width*11/20, 0), 50 * width/960)
+        textdisplay(f'{player.health} / {player.maxhealth}', (width*11/20, height*2/20), 50 * width/960)
+        textdisplay(f'Enemy hp:', (width*11/20, height * 5/20), 50 * width/960)
+        textdisplay(f'{enemy.health} / {enemy.maxhealth}', (width*11/20, height*7/20), 50 * width/960)
+        textdisplay(f'{player.energy}/{player.maxenergy}', (0, height/2), 80 * width/960)
 
         # Buttons
         if viewdeckbutton.draw():
