@@ -368,6 +368,7 @@ class Enemy:
         # Spritelist: 0 - Idle, 1 - Attack, 2 - Defend, 3 - Special
         self.name = data[0]
         self.maxhealth = data[1]
+        self.defence = 0 # Defence will be 0 until the enemy uses a defend move
         self.health = self.maxhealth
         self.basedamage = data[2] # Attack damage can be between +20% and -20% of base
         self.specialdamage = data[3]
@@ -382,7 +383,7 @@ class Enemy:
         }
 
     def render(self): # Draws enemy sprite to screen during combat
-        screen.blit(self.spritelist[0], (width*5/16, height*1/8))
+        screen.blit(self.spritelist[0], (width*5/16, height*3/16))
 
 
 # Player Class
@@ -423,7 +424,7 @@ class Player:
         self.incombat = False
 
     def render(self): # Draw player sprite to screen during combat
-        screen.blit(self.spritelist[0], (width*1/16, height*1/8))
+        screen.blit(self.spritelist[0], (width*1/16, height*3/16))
 
     def draw(self, amount):
         for i in range(amount):
@@ -558,7 +559,7 @@ friendsmenutitle = settingstitlefont.render('Friends Menu', True, white) # Uses 
 friendsmenutitlepos = (width/20, height/20)
 
 # Combat Menu
-infobox = pygame.Rect((width*11/20, 0), (width*9/20, height*9/20))
+infobox = pygame.Rect((width*11/20, 0), (width*9/20, height*49/100))
 
 # Deck View Menus
 fulldeckmenutitle = settingstitlefont.render('Full Deck', True, white)
@@ -769,11 +770,17 @@ while run:
         enemy.render()
 
         # Info box information
-        textdisplay(f'Player hp:', (width*11/20, 0), 50 * width/960)
+        textdisplay('Player hp:', (width*11/20, 0), 50 * width/960)
         textdisplay(f'{player.health} / {player.maxhealth}', (width*11/20, height*2/20), 50 * width/960)
-        textdisplay(f'Enemy hp:', (width*11/20, height * 5/20), 50 * width/960)
+        if player.defence > 0:
+            textdisplay(f'Player defence: {player.defence}', (width*11/20, height*7/40), 30 * width/960)
+
+        textdisplay('Enemy hp:', (width*11/20, height * 5/20), 50 * width/960)
         textdisplay(f'{enemy.health} / {enemy.maxhealth}', (width*11/20, height*7/20), 50 * width/960)
-        textdisplay(f'{player.energy}/{player.maxenergy}', (0, height/2), 80 * width/960)
+        if enemy.defence > 0:
+            textdisplay(f'Enemy defence: {enemy.defence}', (width*11/20, height*17/40), 30 * width/960)
+
+        textdisplay(f'{player.energy}/{player.maxenergy}', (0, height/2), 60 * width/960)
 
         # Buttons
         if viewdeckbutton.draw():
