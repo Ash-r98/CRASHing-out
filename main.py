@@ -381,6 +381,9 @@ class Enemy:
             'disguise': False
         }
 
+    def render(self): # Draws enemy sprite to screen
+        screen.blit(self.spritelist[0], (width/4, height/4))
+
 
 # Player Class
 class Player:
@@ -476,6 +479,7 @@ defendcardsprite = pygame.image.load(Path('Cards/defendcard.png'))
 
 # ========== Dictionaries ==========
 
+# 0 - name, 1 - basedamage, 2 - basedefence, 3 - cost, 4 - effectlist, 5 - sprite
 carddict = {
     'attack': ['attack', 6, 0, 1, [], attackcardsprite],
     'defend': ['defend', 0, 5, 1, [], defendcardsprite],
@@ -485,9 +489,10 @@ carddict = {
     'volatile strike': ['volatile strike', 22, 0, 2, ['self-delete'], cardsprite]
 }
 
+# 0 - name, 1 - maxhealth, 2 - basedamage, 3 - specialdamage, 4 - defendamount, 5 - advancedai, 6 - difficulty, 7 - abilitylist, 8 - spritelist
 enemydict = {
-    'virus': [20, 6, 14, 6, False, [], []],
-    'trojan': [40, 10, 20, 10, False, ['disguise'], []]
+    'virus': ['virus', 20, 6, 14, 6, False, 1, [], [whitesprite, whitesprite, whitesprite, whitesprite]],
+    'trojan': ['trojan', 40, 10, 20, 10, False, 3, ['disguise'], []]
 }
 
 
@@ -556,6 +561,11 @@ discardpilemenutitle = settingstitlefont.render('Discard Pile', True, white)
 discardpilemenutitlepos = (width/50, height/50)
 trashpilemenutitle = settingstitlefont.render('Trash Pile', True, white)
 trashpilemenutitlepos = (width/50, height/50)
+
+
+# Combat variables
+currentenemy = 'virus'
+nextreward = ''
 
 
 # Character backup variable
@@ -742,6 +752,10 @@ while run:
 
         textdisplay(f'{player.health}/{player.maxhealth}', (0, 0), 100)
         textdisplay(f'{player.energy}/{player.maxenergy}', (0, 100), 100)
+
+        # Enemy display
+        enemy = Enemy(enemydict[currentenemy])
+        enemy.render()
 
         # Buttons
         if viewdeckbutton.draw():
