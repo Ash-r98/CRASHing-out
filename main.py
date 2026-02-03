@@ -353,6 +353,11 @@ class Card:
         card = player.hand.pop(handindex)
 
         # Card effects
+        if self.damage > 0:
+            enemy.takedamage(self.damage)
+
+        if self.defence > 0:
+            player.gaindefence(self.defence)
 
         # Discard card
         if not 'selfdelete' in self.effectlist:
@@ -369,6 +374,7 @@ class Enemy:
         self.name = data[0]
         self.maxhealth = data[1]
         self.defence = 0 # Defence will be 0 until the enemy uses a defend move
+        self.alive = True
         self.health = self.maxhealth
         self.basedamage = data[2] # Attack damage can be between +20% and -20% of base
         self.specialdamage = data[3]
@@ -384,6 +390,12 @@ class Enemy:
 
     def render(self): # Draws enemy sprite to screen during combat
         screen.blit(self.spritelist[0], (width*5/16, height*3/16))
+
+    def takedamage(self, damage):
+        self.health -= damage
+        if self.health <= 0:
+            self.health = 0
+            self.alive = False
 
 
 # Player Class
@@ -403,6 +415,7 @@ class Player:
         self.character = None
         self.incombat = False
         self.spritelist = []
+        self.alive = True
 
     def startrun(self, newcharacter):
         # Character variables
@@ -422,18 +435,25 @@ class Player:
         self.energy = self.maxenergy
         self.maxhandsize = 9
         self.incombat = False
+        self.alive = True
 
     def render(self): # Draw player sprite to screen during combat
         screen.blit(self.spritelist[0], (width*1/16, height*3/16))
 
     def draw(self, amount):
         for i in range(amount):
+            # If hand is full
+            if len(self.hand) >= self.maxhandsize:
+                continue
             if len(self.drawpile) <= 0:
                 self.drawpile = self.discardpile
                 self.discardpile = []
                 shuffle(self.drawpile)
             if len(self.drawpile) > 0:  # Draw pile may still be empty after an attempted shuffle
                 self.hand.append(self.drawpile.pop())
+
+    def gaindefence(self, defence):
+        self.defence += defence
 
 
 # Font template: int((font size in 960:540) * (width/960))
@@ -762,6 +782,20 @@ while run:
             # Enemy instantiation
             enemy = Enemy(enemydict[currentenemy])
 
+        # Win detection
+        if not enemy.alive: # Player wins
+            pass
+        elif not player.alive: # Enemy wins
+            pass
+
+        # Validation
+        if player.health > player.maxhealth:
+            player.health = player.maxhealth
+        if player.energy > player.maxenergy:
+            player.energy = player.maxenergy
+        if enemy.health > enemy.maxhealth:
+            enemy.health = enemy.maxhealth
+
         # Info box
         pygame.draw.rect(screen, darkgrey, infobox)
 
@@ -898,13 +932,15 @@ while run:
                     state = 10
 
                 elif event.key == pygame.K_o:
-                    player.deck.append('attack')
+                    player.hand.append('attack')
                 elif event.key == pygame.K_p:
-                    player.deck.append('defend')
+                    player.hand.append('defend')
                 elif event.key == pygame.K_i:
                     player.hand = []
                 elif event.key == pygame.K_SPACE:
                     player.draw(1)
+                elif event.key == pygame.K_e:
+                    player.energy += 1
 
                 # Quit button
                 elif event.key == pygame.K_q:
