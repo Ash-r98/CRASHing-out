@@ -354,7 +354,7 @@ class Card:
 
         # Card effects
         if self.damage > 0:
-            enemy.takedamage(self.damage)
+            player.attack(self.damage)
 
         if self.defence > 0:
             player.gaindefence(self.defence)
@@ -416,6 +416,8 @@ class Player:
         self.incombat = False
         self.spritelist = []
         self.alive = True
+        self.currentspriteid = 0
+        self.lastspritechange = datetime.now()
 
     def startrun(self, newcharacter):
         # Character variables
@@ -436,9 +438,13 @@ class Player:
         self.maxhandsize = 9
         self.incombat = False
         self.alive = True
+        self.currentspriteid = 0
+        self.lastspritechange = datetime.now()
 
     def render(self): # Draw player sprite to screen during combat
-        screen.blit(self.spritelist[0], (width*1/16, height*3/16))
+        if datetime.now() - self.lastspritechange > timedelta(milliseconds=1000):
+            self.currentspriteid = 0
+        screen.blit(self.spritelist[self.currentspriteid], (width*1/16, height*3/16))
 
     def draw(self, amount):
         for i in range(amount):
@@ -452,8 +458,15 @@ class Player:
             if len(self.drawpile) > 0:  # Draw pile may still be empty after an attempted shuffle
                 self.hand.append(self.drawpile.pop())
 
+    def attack(self, damage):
+        enemy.takedamage(damage)
+        self.currentspriteid = 1
+        self.lastspritechange = datetime.now()
+
     def gaindefence(self, defence):
         self.defence += defence
+        self.currentspriteid = 2
+        self.lastspritechange = datetime.now()
 
 
 # Font template: int((font size in 960:540) * (width/960))
@@ -525,9 +538,9 @@ enemydict = {
 # Character Instances
 herostarterdeck = ['attack', 'attack', 'attack', 'attack', 'defend', 'defend', 'defend', 'defend']
 herobutton = CharacterButton('Hero', whitesprite, blacksprite, 'Matrix Background.png', 'The hero is cool')
-hero = Character('Hero', herobutton, [whitesprite, whitesprite, whitesprite, whitesprite], herostarterdeck, 100)
+hero = Character('Hero', herobutton, [whitesprite, blacksprite, blacksprite, blacksprite], herostarterdeck, 100)
 testbutton = CharacterButton('test', whitesprite, blacksprite, 'xsprite.png', 'test description')
-test = Character('test', testbutton, whitesprite, [], 999)
+test = Character('test', testbutton, [whitesprite, blacksprite, blacksprite, blacksprite], [], 999)
 
 characterlist = [hero, test]
 
