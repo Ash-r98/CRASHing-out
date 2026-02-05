@@ -409,7 +409,7 @@ class Enemy:
 
     def damagevariation(self, basedamage):
         percentagechange = randint(80, 120) # 20% more or less damage per attack
-        return basedamage // (100 / percentagechange) # Floors returned damage
+        return int(basedamage // (100 / percentagechange)) # Floors returned damage
 
     def decidemove(self, turncounter):
         if not self.advancedai:
@@ -418,11 +418,11 @@ class Enemy:
             else:
                 decision = randint(0, 2)
                 # 0 or 1 - Normal attack, more likely than other moves
-                if decision == 0:
+                if decision == 0 or decision == 1:
                     return 'attack', self.damagevariation(self.basedamage)
 
                 # 2 - Defend
-                elif decision == 1:
+                elif decision == 2:
                     return 'defend', self.defendamount
 
 
@@ -525,6 +525,9 @@ settingstitlefont = pygame.font.Font(fontname, settingstitlefontsize)
 quitconfirmfontsize = int(50*(width/960))
 quitconfirmfont = pygame.font.Font(fontname, quitconfirmfontsize)
 
+enemymovenumberfontsize = int(60*(width/960))
+enemymovenumberfont = pygame.font.Font(fontname, enemymovenumberfontsize)
+
 # Colours
 white = (255, 255, 255)
 green = (0, 255, 0)
@@ -557,6 +560,9 @@ attackcardsprite = pygame.image.load(Path('Cards/attackcard.png'))
 defendcardsprite = pygame.image.load(Path('Cards/defendcard.png'))
 endturnsprite = pygame.image.load(Path('Sprites/endturnbutton.png'))
 endturnspritehover = pygame.image.load(Path('Sprites/endturnbuttonhover.png'))
+swordsprite = pygame.image.load(Path('Sprites/pixel sword.png'))
+shieldsprite = pygame.image.load(Path('Sprites/pixel shield.png'))
+swordspritered = pygame.image.load(Path('Sprites/pixel sword red.png'))
 
 
 # ========== Dictionaries ==========
@@ -656,7 +662,8 @@ enemy = ''
 nextreward = ''
 turncounter = 0
 turnstart = True
-enemymove = ['', 0]
+enemymove = None
+enemytextcolour = green
 
 
 # Character backup variable
@@ -877,8 +884,18 @@ while run:
         enemy.render()
 
         # Display next enemy move
-        if enemymove[0] == 'attack' or enemymove[0] == 'specialattack':
-            pass
+        if enemymove != None:
+            if enemymove[0] == 'attack':
+                screen.blit(swordsprite, (width*5/16, height*1/16))
+                enemytextcolour = green
+            elif enemymove[0] == 'defend':
+                screen.blit(shieldsprite, (width*5/16, height*1/16))
+                enemytextcolour = green
+            elif enemymove[0] == 'specialattack':
+                screen.blit(swordspritered, (width * 5 / 16, height * 1 / 16))
+                enemytextcolour = red
+            enemymovenumbertext = enemymovenumberfont.render(str(enemymove[1]), True, enemytextcolour)
+            screen.blit(enemymovenumbertext, (width*25/64, height*1/16))
 
         # Info box information
         textdisplay('Player hp:', (width*11/20, 0), 50 * width/960)
