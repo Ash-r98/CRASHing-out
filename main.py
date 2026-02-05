@@ -392,6 +392,13 @@ class Enemy:
         screen.blit(self.spritelist[0], (width*5/16, height*3/16))
 
     def takedamage(self, damage):
+        if self.defence != 0:
+            self.defence -= damage
+            if self.defence < 0:
+                damage = self.defence * -1 # Health damage is set to the overflow shield damage
+                self.defence = 0
+            else:
+                damage = 0 # Health damage is removed if defence wasn't broken
         self.health -= damage
         if self.health <= 0:
             self.health = 0
@@ -475,6 +482,14 @@ class Player:
 
     def resetdefence(self):
         self.defence = 0
+
+    def resetenergy(self):
+        self.energy = self.maxenergy
+
+    def discardhand(self):
+        if len(self.hand) > 0:
+            self.discardpile += self.hand
+            self.hand = []
 
 
 # Font template: int((font size in 960:540) * (width/960))
@@ -570,6 +585,7 @@ viewdrawpilebutton = Button(width*1/20, height*7/10, cardsprite, attackcardsprit
 viewdiscardpilebutton = Button(width*18/20, height*7/10, cardsprite, attackcardsprite, width/1920)
 viewtrashpilebutton = Button(width*17/20, height*8/10, cardsprite, attackcardsprite, width/1920)
 endturnbutton = Button(width*5/32, height*2/5, endturnsprite, endturnspritehover, width/960)
+combatbackbutton = Button(width*17/20, height*3/4, backsprite, backspritehover, width/960)
 
 
 # Textbox Instances
@@ -825,8 +841,9 @@ while run:
         if turnstart:
             turnstart = False # Only runs once
             turncounter += 1
-            # Reset player and enemy defence
+            # Reset player and enemy attributes
             player.resetdefence()
+            player.resetenergy()
             enemy.resetdefence()
             # Player draws card for their turn
             player.draw(5)
@@ -855,7 +872,9 @@ while run:
 
         # Buttons
         if endturnbutton.draw():
-            pass
+            player.discardhand()
+            turnstart = True
+            # Enemy action
 
         if viewdeckbutton.draw():
             state = 7
@@ -884,12 +903,18 @@ while run:
 
         displaycardpile(player.deck)
 
+        if combatbackbutton.draw():
+            state = 6
+
 
     elif state == 8: # View draw pile
         # Title text
         screen.blit(drawpilemenutitle, drawpilemenutitlepos)
 
         displaycardpile(player.drawpile)
+
+        if combatbackbutton.draw():
+            state = 6
 
 
     elif state == 9: # View discard pile
@@ -898,12 +923,18 @@ while run:
 
         displaycardpile(player.discardpile)
 
+        if combatbackbutton.draw():
+            state = 6
+
 
     elif state == 10: # View trash pile
         # Title text
         screen.blit(trashpilemenutitle, trashpilemenutitlepos)
 
         displaycardpile(player.trashpile)
+
+        if combatbackbutton.draw():
+            state = 6
 
 
 
