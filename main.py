@@ -407,6 +407,24 @@ class Enemy:
     def resetdefence(self):
         self.defence = 0
 
+    def damagevariation(self, basedamage):
+        percentagechange = randint(80, 120) # 20% more or less damage per attack
+        return basedamage // (100 / percentagechange) # Floors returned damage
+
+    def decidemove(self, turncounter):
+        if not self.advancedai:
+            if turncounter % 3 == 0: # Will always special attack every 3 turns
+                return 'specialattack', self.damagevariation(self.specialdamage)
+            else:
+                decision = randint(0, 2)
+                # 0 or 1 - Normal attack, more likely than other moves
+                if decision == 0:
+                    return 'attack', self.damagevariation(self.basedamage)
+
+                # 2 - Defend
+                elif decision == 1:
+                    return 'defend', self.defendamount
+
 
 # Player Class
 class Player:
@@ -638,6 +656,7 @@ enemy = ''
 nextreward = ''
 turncounter = 0
 turnstart = True
+enemymove = ['', 0]
 
 
 # Character backup variable
@@ -848,7 +867,7 @@ while run:
             # Player draws card for their turn
             player.draw(5)
             # Enemy chooses a move
-
+            enemymove = enemy.decidemove(turncounter)
 
         # Info box
         pygame.draw.rect(screen, darkgrey, infobox)
@@ -856,6 +875,10 @@ while run:
         # Player and enemy display
         player.render()
         enemy.render()
+
+        # Display next enemy move
+        if enemymove[0] == 'attack' or enemymove[0] == 'specialattack':
+            pass
 
         # Info box information
         textdisplay('Player hp:', (width*11/20, 0), 50 * width/960)
