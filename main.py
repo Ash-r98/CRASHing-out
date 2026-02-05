@@ -397,6 +397,9 @@ class Enemy:
             self.health = 0
             self.alive = False
 
+    def resetdefence(self):
+        self.defence = 0
+
 
 # Player Class
 class Player:
@@ -442,8 +445,10 @@ class Player:
         self.lastspritechange = datetime.now()
 
     def render(self): # Draw player sprite to screen during combat
+        # If non-idle sprite for 1 second, change back to idle sprite
         if datetime.now() - self.lastspritechange > timedelta(milliseconds=1000):
             self.currentspriteid = 0
+        # Draw current sprite to screen
         screen.blit(self.spritelist[self.currentspriteid], (width*1/16, height*3/16))
 
     def draw(self, amount):
@@ -460,13 +465,16 @@ class Player:
 
     def attack(self, damage):
         enemy.takedamage(damage)
-        self.currentspriteid = 1
+        self.currentspriteid = 1 # Attack sprite
         self.lastspritechange = datetime.now()
 
     def gaindefence(self, defence):
         self.defence += defence
-        self.currentspriteid = 2
+        self.currentspriteid = 2 # Defend sprite
         self.lastspritechange = datetime.now()
+
+    def resetdefence(self):
+        self.defence = 0
 
 
 # Font template: int((font size in 960:540) * (width/960))
@@ -514,6 +522,8 @@ whitesprite = pygame.image.load(Path('Sprites/white.png'))
 cardsprite = pygame.image.load(Path('Cards/cardbackground.png'))
 attackcardsprite = pygame.image.load(Path('Cards/attackcard.png'))
 defendcardsprite = pygame.image.load(Path('Cards/defendcard.png'))
+endturnsprite = pygame.image.load(Path('Sprites/endturnbutton.png'))
+endturnspritehover = pygame.image.load(Path('Sprites/endturnbuttonhover.png'))
 
 
 # ========== Dictionaries ==========
@@ -559,6 +569,7 @@ viewdeckbutton = Button(width*9/10, height*1/10, cardsprite, attackcardsprite, w
 viewdrawpilebutton = Button(width*1/20, height*7/10, cardsprite, attackcardsprite, width/1920)
 viewdiscardpilebutton = Button(width*18/20, height*7/10, cardsprite, attackcardsprite, width/1920)
 viewtrashpilebutton = Button(width*17/20, height*8/10, cardsprite, attackcardsprite, width/1920)
+endturnbutton = Button(width*5/32, height*2/5, endturnsprite, endturnspritehover, width/960)
 
 
 # Textbox Instances
@@ -609,6 +620,8 @@ trashpilemenutitlepos = (width/50, height/50)
 currentenemy = 'virus'
 enemy = ''
 nextreward = ''
+turncounter = 0
+turnstart = True
 
 
 # Character backup variable
@@ -791,7 +804,6 @@ while run:
             player.discardpile = []
             player.trashpile = []
             player.incombat = True # Will only run once per combat
-            player.draw(1)
             # Enemy instantiation
             enemy = Enemy(enemydict[currentenemy])
 
@@ -808,6 +820,18 @@ while run:
             player.energy = player.maxenergy
         if enemy.health > enemy.maxhealth:
             enemy.health = enemy.maxhealth
+
+        # Runs at the start of each turn
+        if turnstart:
+            turnstart = False # Only runs once
+            turncounter += 1
+            # Reset player and enemy defence
+            player.resetdefence()
+            enemy.resetdefence()
+            # Player draws card for their turn
+            player.draw(5)
+            # Enemy chooses a move
+
 
         # Info box
         pygame.draw.rect(screen, darkgrey, infobox)
@@ -830,6 +854,9 @@ while run:
         textdisplay(f'{player.energy}/{player.maxenergy}', (0, height/2), 60 * width/960)
 
         # Buttons
+        if endturnbutton.draw():
+            pass
+
         if viewdeckbutton.draw():
             state = 7
         if viewdrawpilebutton.draw():
