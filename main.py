@@ -462,6 +462,7 @@ class Player:
         self.alive = True
         self.currentspriteid = 0
         self.lastspritechange = datetime.now()
+        self.score = 0
 
     def startrun(self, newcharacter):
         # Character variables
@@ -484,6 +485,7 @@ class Player:
         self.alive = True
         self.currentspriteid = 0
         self.lastspritechange = datetime.now()
+        self.score = 0
 
     def render(self): # Draw player sprite to screen during combat
         # If non-idle sprite for 1 second, change back to idle sprite
@@ -556,6 +558,10 @@ quitconfirmfont = pygame.font.Font(fontname, quitconfirmfontsize)
 
 enemymovenumberfontsize = int(60*(width/960))
 enemymovenumberfont = pygame.font.Font(fontname, enemymovenumberfontsize)
+
+deathscreenscorefontsize = int(70*(width/960))
+deathscreenscorefont = pygame.font.Font(fontname, deathscreenscorefontsize)
+
 
 # Colours
 white = (255, 255, 255)
@@ -883,9 +889,9 @@ while run:
 
         # Win detection
         if not enemy.alive: # Player wins
-            pass
+            state = 11
         elif not player.alive: # Enemy wins
-            pass
+            state = 12
 
         # Validation
         if player.health > player.maxhealth:
@@ -1018,6 +1024,22 @@ while run:
             combatbackbuttonnow = datetime.now()
 
 
+    elif state == 11: # Post-combat reward menu
+        player.incombat = False
+
+
+    elif state == 12: # Death screen
+        deathscreenbackground = pygame.transform.scale(pygame.image.load(Path('Sprites/deathscreenbackground.png')), (width, height))
+        screen.blit(deathscreenbackground, (0, 0))
+
+        playerfinalscoretext1 = deathscreenscorefont.render('Score:', True, red)
+        playerfinalscoretext2 = deathscreenscorefont.render(str(player.score), True, red)
+        screen.blit(playerfinalscoretext1, (width*13/20, height*1/20))
+        screen.blit(playerfinalscoretext2, (width*13/20, height*3/20))
+
+
+
+
 
 
     # If no valid menu found for state variable value
@@ -1080,8 +1102,12 @@ while run:
                     state = 8
                 elif event.key == pygame.K_9:
                     state = 9
-                elif event.key == pygame.K_w:
+                elif event.key == pygame.K_MINUS:
                     state = 10
+                elif event.key == pygame.K_EQUALS:
+                    state = 11
+                elif event.key == pygame.K_BACKSPACE:
+                    state = 12
 
                 elif event.key == pygame.K_o:
                     player.hand.append('attack')
