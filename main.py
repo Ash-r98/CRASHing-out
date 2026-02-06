@@ -600,6 +600,7 @@ shieldsprite = pygame.image.load(Path('Sprites/pixel shield.png'))
 swordspritered = pygame.image.load(Path('Sprites/pixel sword red.png'))
 backspritered = pygame.image.load(Path('Sprites/backbuttonred.png'))
 backspritehoverred = pygame.image.load(Path('Sprites/backbuttonhoverred.png'))
+deathscreenbackground = pygame.image.load(Path('Sprites/deathscreenbackground.png'))
 
 
 # ========== Dictionaries ==========
@@ -1032,13 +1033,11 @@ while run:
 
     elif state == 11: # Post-combat reward menu
         player.incombat = False
-        turnstart = True
 
 
     elif state == 12: # Death screen
         player.incombat = False
-        turnstart = True
-        deathscreenbackground = pygame.transform.scale(pygame.image.load(Path('Sprites/deathscreenbackground.png')), (width, height))
+        deathscreenbackground = pygame.transform.scale(deathscreenbackground, (width, height))
         screen.blit(deathscreenbackground, (0, 0))
 
         playerfinalscoretext1 = deathscreenscorefont.render('Score:', True, red)
