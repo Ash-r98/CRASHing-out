@@ -707,11 +707,14 @@ state = 0 # 0 = Login menu, 1 = Main menu
 username = ''
 password = ''
 quitconfirm = False
+
+# Time variables
 quitcancelnow = datetime.now()
 playnow = datetime.now()
 chrselectnow = datetime.now()
 prevchrselectnow = datetime.now()
 prevplayedcardnow = datetime.now()
+combatbackbuttonnow = datetime.now()
 
 # Devmode variables
 toggledev = False
@@ -950,13 +953,13 @@ while run:
             elif enemymove[0] == 'defend':
                 enemy.gaindefence(enemymove[1])
 
-        if viewdeckbutton.draw():
+        if viewdeckbutton.draw() and datetime.now() - combatbackbuttonnow > timedelta(milliseconds=500):
             state = 7
-        if viewdrawpilebutton.draw():
+        if viewdrawpilebutton.draw() and datetime.now() - combatbackbuttonnow > timedelta(milliseconds=500):
             state = 8
-        if viewdiscardpilebutton.draw():
+        if viewdiscardpilebutton.draw() and datetime.now() - combatbackbuttonnow > timedelta(milliseconds=500):
             state = 9
-        if viewtrashpilebutton.draw():
+        if viewtrashpilebutton.draw() and datetime.now() - combatbackbuttonnow > timedelta(milliseconds=500):
             state = 10
 
         playedcardindex = renderhand(player.hand)
@@ -979,6 +982,7 @@ while run:
 
         if combatbackbutton.draw():
             state = 6
+            combatbackbuttonnow = datetime.now()
 
 
     elif state == 8: # View draw pile
@@ -989,6 +993,7 @@ while run:
 
         if combatbackbutton.draw():
             state = 6
+            combatbackbuttonnow = datetime.now()
 
 
     elif state == 9: # View discard pile
@@ -999,6 +1004,7 @@ while run:
 
         if combatbackbutton.draw():
             state = 6
+            combatbackbuttonnow = datetime.now()
 
 
     elif state == 10: # View trash pile
@@ -1009,6 +1015,7 @@ while run:
 
         if combatbackbutton.draw():
             state = 6
+            combatbackbuttonnow = datetime.now()
 
 
 
