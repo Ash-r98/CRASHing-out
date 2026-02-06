@@ -383,13 +383,19 @@ class Enemy:
         self.difficulty = data[6]
         self.abilitylist = data[7]
         self.spritelist = data[8]
+        self.currentspriteid = 0
+        self.lastspritechange = datetime.now()
         self.enemyabilitydict = {
             # All enemy abilities
             'disguise': False
         }
 
     def render(self): # Draws enemy sprite to screen during combat
-        screen.blit(self.spritelist[0], (width*5/16, height*3/16))
+        # If non-idle sprite for 1 second, change back to idle sprite
+        if datetime.now() - self.lastspritechange > timedelta(milliseconds=1000):
+            self.currentspriteid = 0
+        # Draw current sprite to screen
+        screen.blit(self.spritelist[self.currentspriteid], (width*5/16, height*3/16))
 
     def takedamage(self, damage):
         if self.defence != 0:
@@ -424,6 +430,16 @@ class Enemy:
                 # 2 - Defend
                 elif decision == 2:
                     return 'defend', self.defendamount
+
+    def dealdamage(self, damage):
+        player.takedamage(damage)
+        self.currentspriteid = 1  # Attack sprite
+        self.lastspritechange = datetime.now()
+
+    def gaindefence(self, defence):
+        self.defence += defence
+        self.currentspriteid = 2  # Defend sprite
+        self.lastspritechange = datetime.now()
 
 
 # Player Class
@@ -508,6 +524,19 @@ class Player:
         if len(self.hand) > 0:
             self.discardpile += self.hand
             self.hand = []
+
+    def takedamage(self, damage):
+        if self.defence != 0:
+            self.defence -= damage
+            if self.defence < 0:
+                damage = self.defence * -1 # Health damage is set to the overflow shield damage
+                self.defence = 0
+            else:
+                damage = 0 # Health damage is removed if defence wasn't broken
+        self.health -= damage
+        if self.health <= 0:
+            self.health = 0
+            self.alive = False
 
 
 # Font template: int((font size in 960:540) * (width/960))
@@ -867,10 +896,9 @@ while run:
         if turnstart:
             turnstart = False # Only runs once
             turncounter += 1
-            # Reset player and enemy attributes
+            # Reset player attributes
             player.resetdefence()
             player.resetenergy()
-            enemy.resetdefence()
             # Player draws card for their turn
             player.draw(5)
             # Enemy chooses a move
@@ -894,6 +922,7 @@ while run:
             elif enemymove[0] == 'specialattack':
                 screen.blit(swordspritered, (width * 5 / 16, height * 1 / 16))
                 enemytextcolour = red
+            # Always displays text number after displaying relevant sprite
             enemymovenumbertext = enemymovenumberfont.render(str(enemymove[1]), True, enemytextcolour)
             screen.blit(enemymovenumbertext, (width*25/64, height*1/16))
 
@@ -913,8 +942,13 @@ while run:
         # Buttons
         if endturnbutton.draw():
             player.discardhand()
+            enemy.resetdefence()
             turnstart = True
             # Enemy action
+            if enemymove[0] == 'attack' or enemymove[0] == 'specialattack':
+                enemy.dealdamage(enemymove[1])
+            elif enemymove[0] == 'defend':
+                enemy.gaindefence(enemymove[1])
 
         if viewdeckbutton.draw():
             state = 7
