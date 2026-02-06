@@ -598,6 +598,8 @@ endturnspritehover = pygame.image.load(Path('Sprites/endturnbuttonhover.png'))
 swordsprite = pygame.image.load(Path('Sprites/pixel sword.png'))
 shieldsprite = pygame.image.load(Path('Sprites/pixel shield.png'))
 swordspritered = pygame.image.load(Path('Sprites/pixel sword red.png'))
+backspritered = pygame.image.load(Path('Sprites/backbuttonred.png'))
+backspritehoverred = pygame.image.load(Path('Sprites/backbuttonhoverred.png'))
 
 
 # ========== Dictionaries ==========
@@ -623,8 +625,10 @@ enemydict = {
 herostarterdeck = ['attack', 'attack', 'attack', 'attack', 'defend', 'defend', 'defend', 'defend']
 herobutton = CharacterButton('Hero', whitesprite, blacksprite, 'Matrix Background.png', 'The hero is cool')
 hero = Character('Hero', herobutton, [whitesprite, blacksprite, blacksprite, blacksprite], herostarterdeck, 100)
+
+teststarterdeck = ['attack', 'defend']
 testbutton = CharacterButton('test', whitesprite, blacksprite, 'xsprite.png', 'test description')
-test = Character('test', testbutton, [whitesprite, blacksprite, blacksprite, blacksprite], [], 999)
+test = Character('test', testbutton, [whitesprite, blacksprite, blacksprite, blacksprite], teststarterdeck, 999)
 
 characterlist = [hero, test]
 
@@ -645,6 +649,7 @@ viewdiscardpilebutton = Button(width*18/20, height*7/10, cardsprite, attackcards
 viewtrashpilebutton = Button(width*17/20, height*8/10, cardsprite, attackcardsprite, width/1920)
 endturnbutton = Button(width*5/32, height*2/5, endturnsprite, endturnspritehover, width/960)
 combatbackbutton = Button(width*17/20, height*3/4, backsprite, backspritehover, width/960)
+deathscreenbackbutton = Button(width*16/20, height*7/20, backspritered, backspritehoverred, width/960)
 
 
 # Textbox Instances
@@ -883,6 +888,7 @@ while run:
             shuffle(player.drawpile)
             player.discardpile = []
             player.trashpile = []
+            turnstart = True
             player.incombat = True # Will only run once per combat
             # Enemy instantiation
             enemy = Enemy(enemydict[currentenemy])
@@ -1026,9 +1032,12 @@ while run:
 
     elif state == 11: # Post-combat reward menu
         player.incombat = False
+        turnstart = True
 
 
     elif state == 12: # Death screen
+        player.incombat = False
+        turnstart = True
         deathscreenbackground = pygame.transform.scale(pygame.image.load(Path('Sprites/deathscreenbackground.png')), (width, height))
         screen.blit(deathscreenbackground, (0, 0))
 
@@ -1037,7 +1046,9 @@ while run:
         screen.blit(playerfinalscoretext1, (width*13/20, height*1/20))
         screen.blit(playerfinalscoretext2, (width*13/20, height*3/20))
 
-
+        if deathscreenbackbutton.draw():
+            character = None
+            state = 1
 
 
 
