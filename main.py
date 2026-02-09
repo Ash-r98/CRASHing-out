@@ -706,7 +706,7 @@ trashpilemenutitlepos = (width/50, height/50)
 
 # Combat variables
 currentenemy = 'virus'
-enemy = ''
+enemy = None
 nextreward = ''
 turncounter = 0
 turnstart = True
@@ -892,6 +892,8 @@ while run:
 
         # Initial combat setup
         if not player.incombat:
+            enemy = None
+            turncounter = 0
             player.drawpile = player.deck[:]
             shuffle(player.drawpile)
             player.discardpile = []
