@@ -540,6 +540,13 @@ class Player:
             self.health = 0
             self.alive = False
 
+    def postcombatreset(self):
+        self.hand = []
+        self.drawpile = []
+        self.discardpile = []
+        self.trashpile = []
+        self.incombat = False
+
 
 # Font template: int((font size in 960:540) * (width/960))
 font = pygame.font.Font(fontname, 96)
@@ -1032,11 +1039,11 @@ while run:
 
 
     elif state == 11: # Post-combat reward menu
-        player.incombat = False
+        player.postcombatreset()
 
 
     elif state == 12: # Death screen
-        player.incombat = False
+        player.postcombatreset()
         deathscreenbackground = pygame.transform.scale(deathscreenbackground, (width, height))
         screen.blit(deathscreenbackground, (0, 0))
 
