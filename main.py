@@ -803,9 +803,9 @@ level3sprites = lockspritelist
 level4sprites = lockspritelist
 level5sprites = lockspritelist
 # Constant positions of each level button
-level1pos = (width/10, height/10)
+level1pos = (width/5, height/10)
 level2pos = (width*6/10, height/10)
-level3pos = (width/10, height*4/10)
+level3pos = (width/5, height*4/10)
 level4pos = (width*6/10, height*4/10)
 level5pos = (width*4/10, height*7/10)
 
