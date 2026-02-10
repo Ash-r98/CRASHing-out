@@ -521,6 +521,8 @@ class Player:
         self.currentspriteid = 0
         self.lastspritechange = datetime.now()
         self.score = 0
+        self.floor = 1
+        self.floorstage = 1
 
     def startrun(self, newcharacter):
         # Character variables
@@ -666,6 +668,7 @@ swordspritered = pygame.image.load(Path('Sprites/pixel sword red.png'))
 backspritered = pygame.image.load(Path('Sprites/backbuttonred.png'))
 backspritehoverred = pygame.image.load(Path('Sprites/backbuttonhoverred.png'))
 deathscreenbackground = pygame.image.load(Path('Sprites/deathscreenbackground.png'))
+mapscreenbackground = pygame.image.load(Path('Sprites/circuit background.jpg'))
 
 
 # ========== Dictionaries ==========
@@ -682,8 +685,13 @@ carddict = {
 
 # 0 - name, 1 - maxhealth, 2 - basedamage, 3 - specialdamage, 4 - defendamount, 5 - advancedai, 6 - difficulty, 7 - abilitylist, 8 - spritelist
 enemydict = {
-    'virus': ['virus', 20, 6, 14, 6, True, 1, [], [whitesprite, whitesprite, whitesprite, whitesprite]],
-    'trojan': ['trojan', 40, 10, 20, 10, False, 3, ['disguise'], [whitesprite, whitesprite, whitesprite, whitesprite]]
+    'virus': ['Virus', 20, 6, 14, 6, False, 1, [], [whitesprite, whitesprite, whitesprite, whitesprite]],
+    'trojan': ['Trojan', 40, 10, 20, 10, False, 3, ['disguise'], [whitesprite, whitesprite, whitesprite, whitesprite]]
+}
+
+
+bossdict = {
+    'windows': ['Windows', 120, 10, 25, 15, True, 2, [], [whitesprite, whitesprite, whitesprite, whitesprite]]
 }
 
 
@@ -941,7 +949,8 @@ while run:
             character = characterlist[0]
             player.startrun(character)
 
-        textdisplay("Map screen", (200, 200), 50)
+        mapscreenbackground = pygame.transform.scale(mapscreenbackground,(width, height))
+        screen.blit(mapscreenbackground, (0, 0))
 
 
     elif state == 6: # Combat screen
@@ -1017,10 +1026,10 @@ while run:
         if player.defence > 0:
             textdisplay(f'Player defence: {player.defence}', (width*11/20, height*7/40), 30 * width/960)
 
-        textdisplay('Enemy hp:', (width*11/20, height * 5/20), 50 * width/960)
+        textdisplay(f'{enemy.name} hp:', (width*11/20, height * 5/20), 50 * width/960)
         textdisplay(f'{enemy.health} / {enemy.maxhealth}', (width*11/20, height*7/20), 50 * width/960)
         if enemy.defence > 0:
-            textdisplay(f'Enemy defence: {enemy.defence}', (width*11/20, height*17/40), 30 * width/960)
+            textdisplay(f'{enemy.name} defence: {enemy.defence}', (width*11/20, height*17/40), 30 * width/960)
 
         textdisplay(f'{player.energy}/{player.maxenergy}', (0, height/2), 60 * width/960)
 
