@@ -435,7 +435,7 @@ class Enemy:
                     return 'defend', self.defendamount
         else:
             # Special move is available every 3 turns
-            if self.lastspecialturn + 3 >= turncounter:
+            if self.lastspecialturn + 3 <= turncounter:
                 self.specialavailable = True
 
             # Guaranteed moves
@@ -454,6 +454,8 @@ class Enemy:
                 # 2/3 chance to use special attack if available and player isn't in kill range
                 specialdecision = randint(0, 2)
                 if specialdecision != 0:
+                    self.specialavailable = False
+                    self.lastspecialturn = turncounter
                     return 'specialattack', self.damagevariation(self.specialdamage)
 
             # Non-guaranteed moves
@@ -680,8 +682,8 @@ carddict = {
 
 # 0 - name, 1 - maxhealth, 2 - basedamage, 3 - specialdamage, 4 - defendamount, 5 - advancedai, 6 - difficulty, 7 - abilitylist, 8 - spritelist
 enemydict = {
-    'virus': ['virus', 20, 6, 14, 6, False, 1, [], [whitesprite, whitesprite, whitesprite, whitesprite]],
-    'trojan': ['trojan', 40, 10, 20, 10, False, 3, ['disguise'], []]
+    'virus': ['virus', 20, 6, 14, 6, True, 1, [], [whitesprite, whitesprite, whitesprite, whitesprite]],
+    'trojan': ['trojan', 40, 10, 20, 10, False, 3, ['disguise'], [whitesprite, whitesprite, whitesprite, whitesprite]]
 }
 
 
