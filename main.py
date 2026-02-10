@@ -1,7 +1,7 @@
 import pygame
 from pathlib import Path
 from time import sleep
-from random import randint, shuffle
+from random import randint, shuffle, choice
 from datetime import datetime, timedelta
 
 pygame.init()
@@ -521,8 +521,9 @@ class Player:
         self.currentspriteid = 0
         self.lastspritechange = datetime.now()
         self.score = 0
-        self.floor = 1
+        self.floor = 0
         self.floorstage = 1
+        self.newfloor = True
 
     def startrun(self, newcharacter):
         # Character variables
@@ -546,6 +547,9 @@ class Player:
         self.currentspriteid = 0
         self.lastspritechange = datetime.now()
         self.score = 0
+        self.floor = 1
+        self.floorstage = 1
+        self.newfloor = True
 
     def render(self): # Draw player sprite to screen during combat
         # If non-idle sprite for 1 second, change back to idle sprite
@@ -606,6 +610,13 @@ class Player:
         self.discardpile = []
         self.trashpile = []
         self.incombat = False
+
+
+class Level:
+    def __init__(self, newenemy, newreward, newstage):
+        self.enemy = newenemy
+        self.reward = newreward
+        self.stage = newstage
 
 
 # Font template: int((font size in 960:540) * (width/960))
@@ -669,6 +680,10 @@ backspritered = pygame.image.load(Path('Sprites/backbuttonred.png'))
 backspritehoverred = pygame.image.load(Path('Sprites/backbuttonhoverred.png'))
 deathscreenbackground = pygame.image.load(Path('Sprites/deathscreenbackground.png'))
 mapscreenbackground = pygame.image.load(Path('Sprites/circuit background.jpg'))
+lockicon = pygame.image.load(Path('Sprites/lockicon.png'))
+lockiconred = pygame.image.load(Path('Sprites/lockiconred.png'))
+openlockicon = pygame.image.load(Path('Sprites/openlock.png'))
+openlockhovericon = pygame.image.load(Path('Sprites/openlockhover.png'))
 
 
 # ========== Dictionaries ==========
@@ -692,6 +707,11 @@ enemydict = {
 
 bossdict = {
     'windows': ['Windows', 120, 10, 25, 15, True, 2, [], [whitesprite, whitesprite, whitesprite, whitesprite]]
+}
+
+
+rewarddict = {
+    'cardreward': ['Card Reward', 'Add a card to your deck']
 }
 
 
@@ -768,6 +788,26 @@ discardpilemenutitle = settingstitlefont.render('Discard Pile', True, white)
 discardpilemenutitlepos = (width/50, height/50)
 trashpilemenutitle = settingstitlefont.render('Trash Pile', True, white)
 trashpilemenutitlepos = (width/50, height/50)
+
+
+# Map screen variables
+level = 1 # Selected level
+levels = [None, None, None, None, None] # List of 5 levels, will be level objects
+# List of locked/unlocked level sprites
+unlockspritelist = [openlockicon, openlockhovericon]
+lockspritelist = [lockicon, lockiconred]
+# Placeholders for the sprites for each level button
+level1sprites = lockspritelist
+level2sprites = lockspritelist
+level3sprites = lockspritelist
+level4sprites = lockspritelist
+level5sprites = lockspritelist
+# Constant positions of each level button
+level1pos = (width/10, height/10)
+level2pos = (width*6/10, height/10)
+level3pos = (width/10, height*4/10)
+level4pos = (width*6/10, height*4/10)
+level5pos = (width*4/10, height*7/10)
 
 
 # Combat variables
@@ -952,6 +992,54 @@ while run:
         mapscreenbackground = pygame.transform.scale(mapscreenbackground,(width, height))
         screen.blit(mapscreenbackground, (0, 0))
 
+        # New floor level generation setup
+        if player.newfloor:
+            player.newfloor = False # Only runs once
+            levels = [None, None, None, None, None]
+            player.floor += 1
+            player.floorstage = 1
+
+            # 4 basic levels in a floor
+            for i in range(4):
+                stage = i // 2 + 1 # 0 or 1 goes to 1, 2 or 3 goes to 2
+                levels[i] = Level(choice(list(enemydict.items())), choice(list(rewarddict.items())), stage)
+
+            # Boss generator
+            levels[4] = Level(choice(list(bossdict.items())), choice(list(rewarddict.items())), 3)
+
+
+        if player.floorstage == 1:
+            level1sprites = unlockspritelist
+            level2sprites = unlockspritelist
+        elif player.floorstage == 2:
+            level3sprites = unlockspritelist
+            level4sprites = unlockspritelist
+        elif player.floorstage == 3:
+            level5sprites = unlockspritelist
+
+        # Level buttons
+        level1button = Button(level1pos[0], level1pos[1], level1sprites[0], level1sprites[1], width/960)
+        level2button = Button(level2pos[0], level2pos[1], level2sprites[0], level2sprites[1], width/960)
+        level3button = Button(level3pos[0], level3pos[1], level3sprites[0], level3sprites[1], width/960)
+        level4button = Button(level4pos[0], level4pos[1], level4sprites[0], level4sprites[1], width/960)
+        level5button = Button(level5pos[0], level5pos[1], level5sprites[0], level5sprites[1], width/960)
+
+        if level1button.drawnobuffer() and player.floorstage == 1:
+            level = 1
+            state = 13
+        if level2button.drawnobuffer() and player.floorstage == 1:
+            level = 2
+            state = 13
+        if level3button.drawnobuffer() and player.floorstage == 2:
+            level = 3
+            state = 13
+        if level4button.drawnobuffer() and player.floorstage == 2:
+            level = 4
+            state = 13
+        if level5button.drawnobuffer() and player.floorstage == 3:
+            level = 5
+            state = 13
+
 
     elif state == 6: # Combat screen
         # Backup in case player has no character
@@ -1127,6 +1215,10 @@ while run:
         if deathscreenbackbutton.draw():
             character = None
             state = 1
+
+
+    elif state == 13: # Pre-level info screen
+        pass
 
 
 
