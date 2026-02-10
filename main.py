@@ -385,6 +385,8 @@ class Enemy:
         self.spritelist = data[8]
         self.currentspriteid = 0
         self.lastspritechange = datetime.now()
+        self.specialavailable = False
+        self.lastspecialturn = 0
         self.enemyabilitydict = {
             # All enemy abilities
             'disguise': False
@@ -420,6 +422,7 @@ class Enemy:
     def decidemove(self, turncounter):
         if not self.advancedai:
             if turncounter % 3 == 0: # Will always special attack every 3 turns
+                self.lastspecialturn = turncounter
                 return 'specialattack', self.damagevariation(self.specialdamage)
             else:
                 decision = randint(0, 2)
@@ -430,6 +433,59 @@ class Enemy:
                 # 2 - Defend
                 elif decision == 2:
                     return 'defend', self.defendamount
+        else:
+            # Special move is available every 3 turns
+            if self.lastspecialturn + 3 >= turncounter:
+                self.specialavailable = True
+
+            # Guaranteed moves
+
+            # If special available and lowest roll of special damage will always kill player
+            if self.specialavailable and player.health <= self.specialdamage * 0.8:
+                self.specialavailable = False
+                self.lastspecialturn = turncounter
+                return 'specialattack', self.damagevariation(self.specialdamage)
+
+            # If special not available and lowest roll of damage will always kill player
+            elif player.health <= self.specialdamage * 0.8:
+                return 'attack', self.damagevariation(self.basedamage)
+
+            if self.specialavailable:
+                # 2/3 chance to use special attack if available and player isn't in kill range
+                specialdecision = randint(0, 2)
+                if specialdecision != 0:
+                    return 'specialattack', self.damagevariation(self.specialdamage)
+
+            # Non-guaranteed moves
+            attackcounter = 3
+            defendcounter = 3
+
+            # Attack bias
+            if player.health <= player.maxhealth * 0.8:
+                attackcounter += 1
+                if player.health <= player.maxhealth * 0.6:
+                    attackcounter += 1
+                    if player.health <= player.maxhealth * 0.4:
+                        attackcounter += 2
+                        if player.health <= player.maxhealth * 0.2:
+                            attackcounter += 2
+            # Defend bias
+            if self.health <= self.maxhealth * 0.8:
+                defendcounter += 1
+                if self.health <= self.maxhealth * 0.6:
+                    defendcounter += 1
+                    if self.health <= self.maxhealth * 0.4:
+                        defendcounter += 1
+                        if self.health <= self.maxhealth * 0.2:
+                            defendcounter += 1
+
+            # Random selection
+            decision = randint(1, attackcounter + defendcounter) # 1 lower bound to not bias extra towards attack
+            if decision <= attackcounter:
+                return 'attack', self.damagevariation(self.basedamage)
+            else:
+                return 'defend', self.defendamount
+
 
     def dealdamage(self, damage):
         player.takedamage(damage)
@@ -883,6 +939,8 @@ while run:
             character = characterlist[0]
             player.startrun(character)
 
+        textdisplay("Map screen", (200, 200), 50)
+
 
     elif state == 6: # Combat screen
         # Backup in case player has no character
@@ -1042,6 +1100,7 @@ while run:
 
     elif state == 11: # Post-combat reward menu
         player.postcombatreset()
+        textdisplay("Post-combat reward screen", (100, 200), 50)
 
 
     elif state == 12: # Death screen
