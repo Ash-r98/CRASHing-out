@@ -547,7 +547,7 @@ class Player:
         self.currentspriteid = 0
         self.lastspritechange = datetime.now()
         self.score = 0
-        self.floor = 1
+        self.floor = 0
         self.floorstage = 1
         self.newfloor = True
 
@@ -991,6 +991,8 @@ while run:
 
         mapscreenbackground = pygame.transform.scale(mapscreenbackground,(width, height))
         screen.blit(mapscreenbackground, (0, 0))
+
+        textdisplay(f'Floor {player.floor}', (0, height-80*width/960), 80*width/960)
 
         # New floor level generation setup
         if player.newfloor:
