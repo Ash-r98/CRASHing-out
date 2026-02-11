@@ -747,6 +747,7 @@ combatbackbutton = Button(width*17/20, height*3/4, backsprite, backspritehover, 
 deathscreenbackbutton = Button(width*16/20, height*7/20, backspritered, backspritehoverred, width/960)
 startcombatbutton = Button(width*1/8, height*3/4, playsprite, playspritehover, width/960)
 mapscreenbackbutton = Button(width*6/8, height*3/4, backsprite, backspritehover, width/960)
+rewardcontinuebutton = Button(width*7/8, height*1/16, playsprite, playspritehover, width/960)
 
 
 # Textbox Instances
@@ -1237,17 +1238,20 @@ while run:
                     rewardcardlist.append(choice(list(carddict.items()))[0])
 
 
-
         textdisplay("Post-combat reward:", (0, 0), 70*width/960)
         textdisplay(currentreward[0], (0, 70*width/960), 60*width/960)
 
         if currentreward[0] == 'Card Reward':
-            if not rewardclaimed:
+            if not rewardclaimed: # Can only claim reward once
                 selectedcardindex = renderhand(rewardcardlist)
                 if selectedcardindex != None:
                     if datetime.now() - prevplayedcardnow > timedelta(milliseconds=500):
                         rewardclaimed = True
                         player.deck.append(rewardcardlist[selectedcardindex])
+
+        # Continue button, player does not have to claim their reward
+        if rewardcontinuebutton.draw():
+            state = 5
 
 
 
@@ -1365,6 +1369,8 @@ while run:
                     player.draw(1)
                 elif event.key == pygame.K_e:
                     player.energy += 1
+                elif event.key == pygame.K_k:
+                    enemy.takedamage(100)
 
                 # Quit button
                 elif event.key == pygame.K_q:
