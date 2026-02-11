@@ -818,6 +818,7 @@ turncounter = 0
 turnstart = True
 enemymove = None
 enemytextcolour = green
+newreward = False
 
 
 # Character backup variable
@@ -1013,10 +1014,20 @@ while run:
         if player.floorstage == 1:
             level1sprites = unlockspritelist
             level2sprites = unlockspritelist
+            level3sprites = lockspritelist
+            level4sprites = lockspritelist
+            level5sprites = lockspritelist
         elif player.floorstage == 2:
+            level1sprites = lockspritelist
+            level2sprites = lockspritelist
             level3sprites = unlockspritelist
             level4sprites = unlockspritelist
+            level5sprites = lockspritelist
         elif player.floorstage == 3:
+            level1sprites = lockspritelist
+            level2sprites = lockspritelist
+            level3sprites = lockspritelist
+            level4sprites = lockspritelist
             level5sprites = unlockspritelist
 
         # Level buttons
@@ -1064,6 +1075,7 @@ while run:
 
         # Win detection
         if not enemy.alive: # Player wins
+            newreward = True
             state = 11
         elif not player.alive: # Enemy wins
             state = 12
@@ -1201,6 +1213,16 @@ while run:
 
     elif state == 11: # Post-combat reward menu
         player.postcombatreset()
+
+        # Increase floor stage or floor
+        if newreward:
+            newreward = False
+            player.floorstage += 1
+            if player.floorstage > 3:
+                player.floor += 1
+                player.newfloor = True
+                player.floorstage -= 3
+
         textdisplay("Post-combat reward screen", (100, 200), 50)
 
 
