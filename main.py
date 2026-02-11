@@ -701,7 +701,8 @@ carddict = {
 # 0 - name, 1 - maxhealth, 2 - basedamage, 3 - specialdamage, 4 - defendamount, 5 - advancedai, 6 - difficulty, 7 - abilitylist, 8 - spritelist
 enemydict = {
     'virus': ['Virus', 20, 6, 14, 6, False, 1, [], [whitesprite, whitesprite, whitesprite, whitesprite]],
-    'trojan': ['Trojan', 40, 10, 20, 10, False, 3, ['disguise'], [whitesprite, whitesprite, whitesprite, whitesprite]]
+    'trojan': ['Trojan', 40, 10, 20, 10, False, 3, ['disguise'], [whitesprite, whitesprite, whitesprite, whitesprite]],
+    'indiegame': ['Indie Game', 65, 7, 12, 6, False, 2, [], [whitesprite, whitesprite, whitesprite, whitesprite]]
 }
 
 
@@ -744,6 +745,8 @@ viewtrashpilebutton = Button(width*17/20, height*8/10, cardsprite, attackcardspr
 endturnbutton = Button(width*5/32, height*2/5, endturnsprite, endturnspritehover, width/960)
 combatbackbutton = Button(width*17/20, height*3/4, backsprite, backspritehover, width/960)
 deathscreenbackbutton = Button(width*16/20, height*7/20, backspritered, backspritehoverred, width/960)
+startcombatbutton = Button(width*1/8, height*3/4, playsprite, playspritehover, width/960)
+mapscreenbackbutton = Button(width*6/8, height*3/4, backsprite, backspritehover, width/960)
 
 
 # Textbox Instances
@@ -811,7 +814,7 @@ level5pos = (width*4/10, height*7/10)
 
 
 # Combat variables
-currentenemy = 'virus'
+currentenemy = enemydict['virus']
 enemy = None
 nextreward = ''
 turncounter = 0
@@ -819,6 +822,11 @@ turnstart = True
 enemymove = None
 enemytextcolour = green
 newreward = False
+
+# Reward screen variables
+currentreward = rewarddict['cardreward']
+rewardcardlist = []
+rewardclaimed = False
 
 
 # Character backup variable
@@ -1005,10 +1013,10 @@ while run:
             # 4 basic levels in a floor
             for i in range(4):
                 stage = i // 2 + 1 # 0 or 1 goes to 1, 2 or 3 goes to 2
-                levels[i] = Level(choice(list(enemydict.items())), choice(list(rewarddict.items())), stage)
+                levels[i] = Level(choice(list(enemydict.items()))[1], choice(list(rewarddict.items()))[1], stage)
 
             # Boss generator
-            levels[4] = Level(choice(list(bossdict.items())), choice(list(rewarddict.items())), 3)
+            levels[4] = Level(choice(list(bossdict.items()))[1], choice(list(rewarddict.items()))[1], 3)
 
 
         if player.floorstage == 1:
@@ -1071,7 +1079,7 @@ while run:
             turnstart = True
             player.incombat = True # Will only run once per combat
             # Enemy instantiation
-            enemy = Enemy(enemydict[currentenemy])
+            enemy = Enemy(currentenemy)
 
         # Win detection
         if not enemy.alive: # Player wins
@@ -1216,14 +1224,31 @@ while run:
 
         # Increase floor stage or floor
         if newreward:
-            newreward = False
+            newreward = False # Only runs once
+            rewardclaimed = False # Can only claim reward once
             player.floorstage += 1
             if player.floorstage > 3:
-                player.floor += 1
                 player.newfloor = True
-                player.floorstage -= 3
 
-        textdisplay("Post-combat reward screen", (100, 200), 50)
+            # Generate rewards
+            if currentreward[0] == 'Card Reward':
+                rewardcardlist = []
+                for i in range(3):
+                    rewardcardlist.append(choice(list(carddict.items()))[0])
+
+
+
+        textdisplay("Post-combat reward:", (0, 0), 70*width/960)
+        textdisplay(currentreward[0], (0, 70*width/960), 60*width/960)
+
+        if currentreward[0] == 'Card Reward':
+            if not rewardclaimed:
+                selectedcardindex = renderhand(rewardcardlist)
+                if selectedcardindex != None:
+                    if datetime.now() - prevplayedcardnow > timedelta(milliseconds=500):
+                        rewardclaimed = True
+                        player.deck.append(rewardcardlist[selectedcardindex])
+
 
 
     elif state == 12: # Death screen
@@ -1242,7 +1267,23 @@ while run:
 
 
     elif state == 13: # Pre-level info screen
-        pass
+        tempenemy = Enemy(levels[level-1].enemy)
+        tempreward = levels[level-1].reward
+
+        textdisplay(f'Upcoming Enemy:', (0, 0), 70*width/960)
+        textdisplay(f'{tempenemy.name} - {tempenemy.maxhealth} health', (0, 70*width/960), 60*width/960)
+
+        textdisplay(f'Upcoming Reward:', (0, 160*width/960), 70*width/960)
+        textdisplay(tempreward[0], (0, 230*width/960), 60*width/960)
+
+        if startcombatbutton.draw():
+            currentenemy = levels[level-1].enemy
+            currentreward = levels[level-1].reward
+            prevplayedcardnow = datetime.now() # Sets card cooldown so you can't accidentally play a card on enter
+            state = 6
+
+        if mapscreenbackbutton.draw():
+            state = 5
 
 
 
