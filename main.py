@@ -355,12 +355,14 @@ class Card:
         # Card effects
         if self.damage > 0:
             player.attack(self.damage)
+            if self.cardeffectdict['doublehit']: # Will deal damage twice
+                player.attack(self.damage)
 
         if self.defence > 0:
             player.gaindefence(self.defence)
 
         # Discard card
-        if not 'selfdelete' in self.effectlist:
+        if not self.cardeffectdict['selfdelete']:
             player.discardpile.append(card)
         else: # Trash card
             player.trashpile.append(card)
@@ -684,6 +686,8 @@ lockicon = pygame.image.load(Path('Sprites/lockicon.png'))
 lockiconred = pygame.image.load(Path('Sprites/lockiconred.png'))
 openlockicon = pygame.image.load(Path('Sprites/openlock.png'))
 openlockhovericon = pygame.image.load(Path('Sprites/openlockhover.png'))
+strikecardsprite = pygame.image.load(Path('Cards/strikecard.png'))
+volatilestrikecardsprite = pygame.image.load(Path('Cards/volatilestrikecard.png'))
 
 
 # ========== Dictionaries ==========
@@ -692,10 +696,10 @@ openlockhovericon = pygame.image.load(Path('Sprites/openlockhover.png'))
 carddict = {
     'attack': ['attack', 6, 0, 1, [], attackcardsprite],
     'defend': ['defend', 0, 5, 1, [], defendcardsprite],
-    'strike': ['strike', 5, 0, 0, [], cardsprite],
+    'strike': ['strike', 5, 0, 0, [], strikecardsprite],
     'heavy guard': ['heavy guard', 0, 14, 2, [], cardsprite],
     'double strike': ['double strike', 4, 0, 1, ['doublehit'], cardsprite],
-    'volatile strike': ['volatile strike', 22, 0, 2, ['self-delete'], cardsprite]
+    'volatile strike': ['volatile strike', 22, 0, 2, ['selfdelete'], volatilestrikecardsprite]
 }
 
 # 0 - name, 1 - maxhealth, 2 - basedamage, 3 - specialdamage, 4 - defendamount, 5 - advancedai, 6 - difficulty, 7 - abilitylist, 8 - spritelist
