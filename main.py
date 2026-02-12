@@ -688,6 +688,8 @@ openlockicon = pygame.image.load(Path('Sprites/openlock.png'))
 openlockhovericon = pygame.image.load(Path('Sprites/openlockhover.png'))
 strikecardsprite = pygame.image.load(Path('Cards/strikecard.png'))
 volatilestrikecardsprite = pygame.image.load(Path('Cards/volatilestrikecard.png'))
+heavyguardcardsprite = pygame.image.load(Path('Cards/heavyguardcard.png'))
+doublestrikecardsprite = pygame.image.load(Path('Cards/doublestrikecard.png'))
 
 
 # ========== Dictionaries ==========
@@ -697,8 +699,8 @@ carddict = {
     'attack': ['attack', 6, 0, 1, [], attackcardsprite],
     'defend': ['defend', 0, 5, 1, [], defendcardsprite],
     'strike': ['strike', 5, 0, 0, [], strikecardsprite],
-    'heavy guard': ['heavy guard', 0, 14, 2, [], cardsprite],
-    'double strike': ['double strike', 4, 0, 1, ['doublehit'], cardsprite],
+    'heavy guard': ['heavy guard', 0, 14, 2, [], heavyguardcardsprite],
+    'double strike': ['double strike', 4, 0, 1, ['doublehit'], doublestrikecardsprite],
     'volatile strike': ['volatile strike', 22, 0, 2, ['selfdelete'], volatilestrikecardsprite]
 }
 
