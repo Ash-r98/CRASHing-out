@@ -527,6 +527,8 @@ class Player:
         self.floor = 0
         self.floorstage = 1
         self.newfloor = True
+        self.strength = 0
+        self.resist = 0
 
     def startrun(self, newcharacter):
         # Character variables
@@ -553,6 +555,8 @@ class Player:
         self.floor = 0
         self.floorstage = 1
         self.newfloor = True
+        self.strength = 0
+        self.resist = 0
 
     def render(self): # Draw player sprite to screen during combat
         # If non-idle sprite for 1 second, change back to idle sprite
@@ -606,6 +610,25 @@ class Player:
         if self.health <= 0:
             self.health = 0
             self.alive = False
+
+    def heal(self, amount):
+        self.health += amount
+        if self.health > self.maxhealth:
+            self.health = self.maxhealth
+
+    def increasemaxhealth(self, amount):
+        self.maxhealth += amount
+        self.health += amount
+
+    def gainstrength(self, amount):
+        self.strength += amount
+
+    def gainresist(self, amount):
+        self.resist += amount
+
+    def increasemaxenergy(self, amount):
+        self.maxenergy += amount
+        self.energy += amount
 
     def postcombatreset(self):
         self.hand = []
@@ -691,6 +714,8 @@ strikecardsprite = pygame.image.load(Path('Cards/strikecard.png'))
 volatilestrikecardsprite = pygame.image.load(Path('Cards/volatilestrikecard.png'))
 heavyguardcardsprite = pygame.image.load(Path('Cards/heavyguardcard.png'))
 doublestrikecardsprite = pygame.image.load(Path('Cards/doublestrikecard.png'))
+claimsprite = pygame.image.load(Path('Sprites/claimsprite.png'))
+claimspritehover = pygame.image.load(Path('Sprites/claimspritehover.png'))
 
 
 # ========== Dictionaries ==========
@@ -708,8 +733,9 @@ carddict = {
 # 0 - name, 1 - maxhealth, 2 - basedamage, 3 - specialdamage, 4 - defendamount, 5 - advancedai, 6 - difficulty, 7 - abilitylist, 8 - spritelist
 enemydict = {
     'virus': ['Virus', 20, 6, 14, 6, False, 1, [], [whitesprite, whitesprite, whitesprite, whitesprite]],
-    'trojan': ['Trojan', 40, 10, 20, 10, False, 3, ['disguise'], [whitesprite, whitesprite, whitesprite, whitesprite]],
-    'indiegame': ['Indie Game', 65, 7, 12, 6, False, 2, [], [whitesprite, whitesprite, whitesprite, whitesprite]]
+    'trojan': ['Trojan', 40, 10, 20, 10, False, 2, ['disguise'], [whitesprite, whitesprite, whitesprite, whitesprite]],
+    'indiegame': ['Indie Game', 65, 7, 12, 6, False, 3, [], [whitesprite, whitesprite, whitesprite, whitesprite]],
+    'encryption': ['Encryption Software', 50, 10, 18, 8, False, 2, [], [whitesprite, whitesprite, whitesprite, whitesprite]]
 }
 
 
@@ -718,8 +744,13 @@ bossdict = {
 }
 
 
+# Card reward is guaranteed every combat
 rewarddict = {
-    'cardreward': ['Card Reward', 'Add a card to your deck']
+    '50heal': ['50% heal', 'Regain 50% of your health'],
+    'maxhealth10': ['Max Health +10', 'Gain 10 maximum health'],
+    'strength1': ['Gain 1 strength', 'Increase all damage dealt by 1'],
+    'resist1': ['Gain 1 resist', 'Increase all block gained by 1'],
+    'maxenergy1': ['Max Energy +1', 'Gain 1 maximum energy']
 }
 
 
@@ -755,6 +786,7 @@ deathscreenbackbutton = Button(width*16/20, height*7/20, backspritered, backspri
 startcombatbutton = Button(width*1/8, height*3/4, playsprite, playspritehover, width/960)
 mapscreenbackbutton = Button(width*6/8, height*3/4, backsprite, backspritehover, width/960)
 rewardcontinuebutton = Button(width*7/8, height*1/16, playsprite, playspritehover, width/960)
+claimbutton = Button(width*1/32, height*7/20, claimsprite, claimspritehover, width/960)
 
 
 # Textbox Instances
@@ -832,9 +864,10 @@ enemytextcolour = green
 newreward = False
 
 # Reward screen variables
-currentreward = rewarddict['cardreward']
+currentreward = rewarddict['50heal']
 rewardcardlist = []
 rewardclaimed = False
+cardrewardclaimed = False
 
 
 # Character backup variable
@@ -1234,28 +1267,44 @@ while run:
         if newreward:
             newreward = False # Only runs once
             rewardclaimed = False # Can only claim reward once
+            cardrewardclaimed = False # Can only claim card reward once
             player.score += player.floorstage * 100 + (player.floor - 1) * 50
             player.floorstage += 1
             if player.floorstage > 3:
                 player.newfloor = True
 
-            # Generate rewards
-            if currentreward[0] == 'Card Reward':
-                rewardcardlist = []
-                for i in range(3):
-                    rewardcardlist.append(choice(list(carddict.items()))[0])
+            # Generate card reward
+            rewardcardlist = []
+            for i in range(3):
+                rewardcardlist.append(choice(list(carddict.items()))[0])
 
 
         textdisplay("Post-combat reward:", (0, 0), 70*width/960)
-        textdisplay(currentreward[0], (0, 70*width/960), 60*width/960)
+        textdisplay(currentreward[0], (0, 70*width/960), 60*width/960) # Reward name
+        textdisplay(currentreward[1], (0, 130*width/960), 40*width/960) # Reward description
 
-        if currentreward[0] == 'Card Reward':
-            if not rewardclaimed: # Can only claim reward once
-                selectedcardindex = renderhand(rewardcardlist)
-                if selectedcardindex != None:
-                    if datetime.now() - prevplayedcardnow > timedelta(milliseconds=500):
-                        rewardclaimed = True
-                        player.deck.append(rewardcardlist[selectedcardindex])
+        # Card reward
+        if not cardrewardclaimed: # Can only claim card reward once
+            selectedcardindex = renderhand(rewardcardlist)
+            if selectedcardindex != None:
+                if datetime.now() - prevplayedcardnow > timedelta(milliseconds=500):
+                    cardrewardclaimed = True
+                    player.deck.append(rewardcardlist[selectedcardindex])
+
+        # Other rewards
+        if not rewardclaimed: # Claim button will only appear if reward is not already claimed
+            if claimbutton.draw():
+                if currentreward[0] == '50% heal':
+                    player.heal(player.maxhealth*0.5)
+                elif currentreward[0] == 'Max Health +10':
+                    player.increasemaxhealth(10)
+                elif currentreward[0] == 'Gain 1 strength':
+                    player.gainstrength(1)
+                elif currentreward[0] == 'Gain 1 resist':
+                    player.gainresist(1)
+                elif currentreward[0] == 'Max Energy +1':
+                    player.increasemaxenergy(1)
+                rewardclaimed = True # Can only claim once
 
         # Continue button, player does not have to claim their reward
         if rewardcontinuebutton.draw():
@@ -1288,10 +1337,10 @@ while run:
         tempreward = levels[level-1].reward
 
         textdisplay(f'Upcoming Enemy:', (0, 0), 70*width/960)
-        textdisplay(f'{tempenemy.name} - {tempenemy.maxhealth} health', (0, 70*width/960), 60*width/960)
+        textdisplay(f'{tempenemy.name} - {tempenemy.maxhealth} health', (0, 70*width/960), 50*width/960)
 
         textdisplay(f'Upcoming Reward:', (0, 160*width/960), 70*width/960)
-        textdisplay(tempreward[0], (0, 230*width/960), 60*width/960)
+        textdisplay(tempreward[0], (0, 230*width/960), 50*width/960)
 
         if startcombatbutton.draw():
             currentenemy = levels[level-1].enemy
