@@ -523,6 +523,7 @@ class Player:
         self.currentspriteid = 0
         self.lastspritechange = datetime.now()
         self.score = 0
+        self.sessionhighscore = 0
         self.floor = 0
         self.floorstage = 1
         self.newfloor = True
@@ -1233,6 +1234,7 @@ while run:
         if newreward:
             newreward = False # Only runs once
             rewardclaimed = False # Can only claim reward once
+            player.score += player.floorstage * 100 + (player.floor - 1) * 50
             player.floorstage += 1
             if player.floorstage > 3:
                 player.newfloor = True
@@ -1270,6 +1272,11 @@ while run:
         playerfinalscoretext2 = deathscreenscorefont.render(str(player.score), True, red)
         screen.blit(playerfinalscoretext1, (width*13/20, height*1/20))
         screen.blit(playerfinalscoretext2, (width*13/20, height*3/20))
+
+        # Update session high score
+        if player.score > player.sessionhighscore:
+            player.sessionhighscore = player.score
+            # Sync session high score with server
 
         if deathscreenbackbutton.draw():
             character = None
@@ -1377,6 +1384,8 @@ while run:
                     player.energy += 1
                 elif event.key == pygame.K_k:
                     enemy.takedamage(100)
+                elif event.key == pygame.K_l:
+                    player.takedamage(100)
 
                 # Quit button
                 elif event.key == pygame.K_q:
