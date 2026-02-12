@@ -578,12 +578,12 @@ class Player:
                 self.hand.append(self.drawpile.pop())
 
     def attack(self, damage):
-        enemy.takedamage(damage)
+        enemy.takedamage(damage + self.strength) # Strength increases all damage
         self.currentspriteid = 1 # Attack sprite
         self.lastspritechange = datetime.now()
 
     def gaindefence(self, defence):
-        self.defence += defence
+        self.defence += defence + self.resist # Resist increases all block
         self.currentspriteid = 2 # Defend sprite
         self.lastspritechange = datetime.now()
 
