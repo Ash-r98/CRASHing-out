@@ -393,6 +393,7 @@ class Enemy:
             # All enemy abilities
             'disguise': False
         }
+        self.floorscale(player.floor)
 
     def render(self): # Draws enemy sprite to screen during combat
         # If non-idle sprite for 1 second, change back to idle sprite
@@ -500,6 +501,14 @@ class Enemy:
         self.defence += defence
         self.currentspriteid = 2  # Defend sprite
         self.lastspritechange = datetime.now()
+
+    def floorscale(self, floornum):
+        scalar = 1 + ((floornum - 1) / 10)
+        self.maxhealth = int(self.maxhealth * scalar)
+        self.health = int(self.health * scalar)
+        self.basedamage = int(self.basedamage * scalar)
+        self.specialdamage = int(self.specialdamage * scalar)
+        self.defendamount = int(self.defendamount * scalar)
 
 
 # Player Class
@@ -619,6 +628,8 @@ class Player:
     def increasemaxhealth(self, amount):
         self.maxhealth += amount
         self.health += amount
+        if self.health > self.maxhealth:
+            self.health = self.maxhealth
 
     def gainstrength(self, amount):
         self.strength += amount
@@ -629,6 +640,8 @@ class Player:
     def increasemaxenergy(self, amount):
         self.maxenergy += amount
         self.energy += amount
+        if self.energy > self.maxenergy:
+            self.energy = self.maxenergy
 
     def postcombatreset(self):
         self.hand = []
@@ -1111,7 +1124,6 @@ while run:
 
         # Initial combat setup
         if not player.incombat:
-            enemy = None
             turncounter = 0
             player.drawpile = player.deck[:]
             shuffle(player.drawpile)
