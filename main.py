@@ -1066,7 +1066,7 @@ while run:
 
             # 2 normal stages in a floor
             for i in range(2):
-                stage = i
+                stage = i + 1
                 firstenemy = choice(list(enemydict.items()))[1]
                 firstreward = choice(list(rewarddict.items()))[1]
                 levels[2 * i] = Level(firstenemy, firstreward, stage)
