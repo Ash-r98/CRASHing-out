@@ -1064,10 +1064,20 @@ while run:
             player.floor += 1
             player.floorstage = 1
 
-            # 4 basic levels in a floor
-            for i in range(4):
-                stage = i // 2 + 1 # 0 or 1 goes to 1, 2 or 3 goes to 2
-                levels[i] = Level(choice(list(enemydict.items()))[1], choice(list(rewarddict.items()))[1], stage)
+            # 2 normal stages in a floor
+            for i in range(2):
+                stage = i
+                firstenemy = choice(list(enemydict.items()))[1]
+                firstreward = choice(list(rewarddict.items()))[1]
+                levels[2 * i] = Level(firstenemy, firstreward, stage)
+
+                secondenemy = choice(list(enemydict.items()))[1]
+                while secondenemy[0] == firstenemy[0]: # Re-randomise until different
+                    secondenemy = choice(list(enemydict.items()))[1]
+                secondreward = choice(list(rewarddict.items()))[1]
+                while secondreward[0] == firstreward[0]: # Re-randomise until different
+                    secondreward = choice(list(rewarddict.items()))[1]
+                levels[2 * i + 1] = Level(secondenemy, secondreward, stage)
 
             # Boss generator
             levels[4] = Level(choice(list(bossdict.items()))[1], choice(list(rewarddict.items()))[1], 3)
