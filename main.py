@@ -11,12 +11,12 @@ pygame.display.set_caption('CRASHing out')
 width = None
 height = None
 volume = None
-difficulty = None
+hardmode = None
 autosynchighscore = None
 backupwidth = 960
 backupheight = 540
 backupvolume = 1
-backupdifficulty = 1
+backuphardmode = False
 backupautosynchighscore = False
 
 # Settings
@@ -38,11 +38,11 @@ with open("settings.txt", 'r+') as settings:
                 volume = int(line[1])
             except:
                 volume = backupvolume
-        elif line[0] == "difficulty":
-            try:
-                difficulty = int(line[1])
-            except:
-                difficulty = backupdifficulty
+        elif line[0] == "hardmode":
+            if line[1] == '1':
+                hardmode = True
+            else:
+                hardmode = False
         elif line[0] == "autosynchighscore":
             if line[1] == '1':
                 autosynchighscore = True
@@ -55,8 +55,8 @@ if height == None:
     height = backupheight
 if volume == None:
     volume = backupheight
-if difficulty == None:
-    difficulty = backupdifficulty
+if hardmode == None:
+    hardmode = backuphardmode
 if autosynchighscore == None:
     autosynchighscore = backupautosynchighscore
 
@@ -231,6 +231,54 @@ class Button:
             self.clicked = False  # Resets if mouse is not held
 
         return action
+
+
+# Toggle button class
+class ToggleButton:
+    def __init__(self, x, y, offimage, offhoverimage, onimage, onhoverimage, scale):
+        # Off and on images should be the same size, if not the button will render at the off image size
+        self.width = offimage.get_width()
+        self.height = offimage.get_height()
+        self.offimage = pygame.transform.scale(offimage, (int(self.width * scale), int(self.height * scale)))
+        self.offhoverimage = pygame.transform.scale(offhoverimage, (int(self.width * scale), int(self.height * scale)))
+        self.onimage = pygame.transform.scale(onimage, (int(self.width * scale), int(self.height * scale)))
+        self.onhoverimage = pygame.transform.scale(onhoverimage, (int(self.width * scale), int(self.height * scale)))
+        self.rect = self.offimage.get_rect()
+        self.rect.topleft = (x,y)
+        self.clicked = False
+        self.buffer = True
+        self.toggle = False # False when toggled off, True when toggled on
+        self.enabled = True
+
+    def draw(self):
+        # Check mouseover and click conditions
+        if ishover(self.rect):
+
+            # Only resets clicked and buffer if mouse is not held on hover
+            if not pygame.mouse.get_pressed()[0]:
+                self.clicked = False  # Resets if mouse is not held
+                self.buffer = False  # User must have not clicked in order to click the button
+
+            # Draw hover button to screen
+            if not self.toggle: # Button is off
+                screen.blit(self.offhoverimage, (self.rect.x, self.rect.y))
+                if isclicked(self.rect) and not self.clicked and not self.buffer and self.enabled: # 0 = left click
+                    self.clicked = True # Can only click once at a time
+                    self.toggle = True # Off -> On
+            else: # Button is on
+                screen.blit(self.onhoverimage, (self.rect.x, self.rect.y))
+                if isclicked(self.rect) and not self.clicked and not self.buffer and self.enabled:  # 0 = left click
+                    self.clicked = True  # Can only click once at a time
+                    self.toggle = False # On -> Off
+
+        else:
+            # Draw non-hover button to screen
+            if not self.toggle:  # Button is off
+                screen.blit(self.offimage, (self.rect.x, self.rect.y))
+            else:
+                screen.blit(self.onimage, (self.rect.x, self.rect.y))
+
+        return self.toggle
 
 
 # Textbox class
