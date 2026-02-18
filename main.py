@@ -851,7 +851,8 @@ startcombatbutton = Button(width*1/8, height*3/4, playsprite, playspritehover, w
 mapscreenbackbutton = Button(width*6/8, height*3/4, backsprite, backspritehover, width/960)
 rewardcontinuebutton = Button(width*7/8, height*1/16, playsprite, playspritehover, width/960)
 claimbutton = Button(width*1/32, height*7/20, claimsprite, claimspritehover, width/960)
-hardmodebutton = ToggleButton(width*4/8, height*5/20, xsprite, xspritehover, ticksprite, tickspritehover, width/1920)
+hardmodebutton = ToggleButton(width*3/8, height*5/20, xsprite, xspritehover, ticksprite, tickspritehover, width/1920)
+autosyncbutton = ToggleButton(width*6/8, height*14/20, xsprite, xspritehover, ticksprite, tickspritehover, width/1920)
 
 
 # Textbox Instances
@@ -1059,6 +1060,8 @@ while run:
 
         # Auto Sync
         screen.blit(autosynctext, autosynctextpos)
+        if autosyncbutton.draw():
+            pass
 
         # Back button in bottom right
         if backbutton.draw():
