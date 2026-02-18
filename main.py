@@ -750,6 +750,9 @@ deathscreenscorefont = pygame.font.Font(fontname, deathscreenscorefontsize)
 settingsfontsize = int(50*(width/960))
 settingsfont = pygame.font.Font(fontname, settingsfontsize)
 
+resolutionwarningfontsize = int(30*(width/960))
+resolutionwarningfont = pygame.font.Font(fontname, resolutionwarningfontsize)
+
 
 # Colours
 white = (255, 255, 255)
@@ -886,6 +889,10 @@ else:
 # Textbox Instances
 usernametextbox = Textbox(width/2, height/3, width*19/40, loginlabelfontsize, darkgrey, grey, lightgrey, green)
 passwordtextbox = Textbox(width/2, height*3/5, width*19/40, loginlabelfontsize, darkgrey, grey, lightgrey, green)
+resolutiontextbox = Textbox(width*10/20, height*8/20, width/8, settingsfontsize, darkgrey, grey, lightgrey, white)
+resolutiontextbox.finaltext = str(width)
+volumetextbox = Textbox(width*6/20, height*11/20, width/8, settingsfontsize, darkgrey, grey, lightgrey, white)
+volumetextbox.finaltext = str(volume)
 
 
 
@@ -912,6 +919,8 @@ hardmodetext = settingsfont.render('Hard Mode:', True, white)
 hardmodetextpos = (width/20, height*5/20)
 resolutiontext = settingsfont.render('Window Width:', True, white)
 resolutiontextpos = (width/20, height*8/20)
+resolutionwarningtext = resolutionwarningfont.render(('(restart game)'), True, red)
+resolutionwarningtextpos = (width*13/20, height*17/40)
 volumetext = settingsfont.render('Volume:', True, white)
 volumetextpos = (width/20, height*11/20)
 autosynctext = settingsfont.render('Auto sync with server:', True, white)
@@ -1088,9 +1097,37 @@ while run:
 
         # Resolution
         screen.blit(resolutiontext, resolutiontextpos)
+        widthtemp = resolutiontextbox.draw()
+        if widthtemp != width and widthtemp != None:
+            # Validation
+            try:
+                widthtemp = int(widthtemp) # If the new width isn't a number this will cause an error
+                if widthtemp >= 144: # 144 is the minimum width
+                    updatesettings('width', f'width={widthtemp}\n')
+                    heighttemp = int(widthtemp * 9 / 16)
+                    updatesettings('height', f'height={heighttemp}\n')
+                    # Game must be restarted for resolution to be updated
+                else:
+                    1 / 0 # Force error
+            except: # Reset to old value
+                resolutiontextbox.finaltext = str(width)
+        # Restart game warning
+        screen.blit(resolutionwarningtext, resolutionwarningtextpos)
 
         # Volume
         screen.blit(volumetext, volumetextpos)
+        volumetemp = volumetextbox.draw()
+        if volumetemp != volume and volumetemp != None:
+            # Validation
+            try:
+                volumetemp = int(volumetemp) # If the new volume isn't a number this will cause an error
+                if volumetemp >= 0 and volumetemp <= 100: # Volume must be between 0 and 100
+                    updatesettings('volume', f'volume={volumetemp}\n')
+                    volume = volumetemp
+                else:
+                    1 / 0 # Force error
+            except: # Reset to old value
+                volumetextbox.finaltext = str(volume)
 
         # Auto Sync
         screen.blit(autosynctext, autosynctextpos)
