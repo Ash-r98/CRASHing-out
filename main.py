@@ -920,6 +920,9 @@ pressenterwarningtext = warningfont.render('(press enter to submit)', True, whit
 pressenterwarningtextpos = (width*41/80, height*41/80)
 loginloadingtext = warningfont.render('Loading...', True, white)
 loginloadingtextpos = (width/10, height*7/8)
+wrongpasswordtext = warningfont.render('Wrong Password', True, red)
+wrongpasswordtextpos = (width*6/10, height*6/8)
+wrongpasswordflag = False
 
 # Main Menu
 quitconfirmbox = pygame.Rect((width/6, height*2/5), (width*2/3, height/5))
@@ -1041,6 +1044,10 @@ while run:
         if passwordtemp != None:
             password = passwordtemp
 
+        # Wrong password text
+        if wrongpasswordflag:
+            screen.blit(wrongpasswordtext, wrongpasswordtextpos)
+
         # Draw login confirmation button
         if username != '' and password != '':
             if loginconfirmbutton.draw():
@@ -1064,9 +1071,10 @@ while run:
                             WHERE username = %s
                         """, (username,)) # There can be multiple identical passwords but not usernames
                         if hashpassword == cursor.fetchone()[0]: # If password is correct
+                            wrongpasswordflag = False
                             state = 1
                         else: # If password is incorrect
-                            print("Wrong password")
+                            wrongpasswordflag = True
 
                     else: # Username not found
                         hashpassword = hashlib.sha256(password.encode()).hexdigest()
