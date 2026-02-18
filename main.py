@@ -1011,6 +1011,7 @@ state = 0 # 0 = Login menu, 1 = Main menu
 username = ''
 password = ''
 quitconfirm = False
+connected = False
 
 # Time variables
 quitcancelnow = datetime.now()
@@ -1073,6 +1074,7 @@ while run:
                         if hashpassword == cursor.fetchone()[0]: # If password is correct
                             wrongpasswordflag = False
                             state = 1
+                            connected = True
                         else: # If password is incorrect
                             wrongpasswordflag = True
 
@@ -1084,9 +1086,11 @@ while run:
                         """, (username, hashpassword, 0, [], []))
                         con.commit()
                         state = 1
+                        connected = True
 
                 except:  # If connection fails
                     state = 1
+                    connected = False
 
         # Press enter warning text
         screen.blit(pressenterwarningtext, pressenterwarningtextpos)
