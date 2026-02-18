@@ -168,6 +168,26 @@ def displaycardpile(pile):
             cardbutton.draw()
 
 
+def updatesettings(setting, newline):
+    # Save current settings from settings file
+    with open('settings.txt', 'r') as settingsfile:
+        settingsdata = settingsfile.readlines()
+
+    # Find setting being changed
+    foundflag = False
+    for i in range(len(settingsdata)):
+        if setting in settingsdata[i]:
+            settingsdata[i] = newline
+            foundflag = True
+    # If setting not currently in the settings file
+    if not foundflag:
+        settingsdata.append(newline)
+
+    # Rewrite data back to settings file
+    with open('settings.txt', 'w') as settingsfile:
+        settingsfile.writelines(settingsdata)
+
+
 
 # ========== Classes ==========
 
@@ -852,7 +872,15 @@ mapscreenbackbutton = Button(width*6/8, height*3/4, backsprite, backspritehover,
 rewardcontinuebutton = Button(width*7/8, height*1/16, playsprite, playspritehover, width/960)
 claimbutton = Button(width*1/32, height*7/20, claimsprite, claimspritehover, width/960)
 hardmodebutton = ToggleButton(width*3/8, height*5/20, xsprite, xspritehover, ticksprite, tickspritehover, width/1920)
+if hardmode:
+    hardmodebutton.toggle = True
+else:
+    hardmodebutton.toggle = False
 autosyncbutton = ToggleButton(width*6/8, height*14/20, xsprite, xspritehover, ticksprite, tickspritehover, width/1920)
+if autosynchighscore:
+    autosyncbutton.toggle = True
+else:
+    autosyncbutton.toggle = False
 
 
 # Textbox Instances
@@ -1049,8 +1077,14 @@ while run:
 
         # Hard Mode
         screen.blit(hardmodetext, hardmodetextpos)
-        if hardmodebutton.draw():
-            pass
+        if hardmodebutton.draw(): # Button is turned on
+            if not hardmode: # If hardmode isn't already enabled
+                updatesettings('hardmode', 'hardmode=1\n')
+                hardmode = True
+        else: # Button is turned off
+            if hardmode: # If hardmode isn't already disabled
+                updatesettings('hardmode', 'hardmode=0\n')
+                hardmode = False
 
         # Resolution
         screen.blit(resolutiontext, resolutiontextpos)
@@ -1060,8 +1094,14 @@ while run:
 
         # Auto Sync
         screen.blit(autosynctext, autosynctextpos)
-        if autosyncbutton.draw():
-            pass
+        if autosyncbutton.draw(): # Button is turned on
+            if not autosynchighscore: # If automatic syncing isn't already enabled
+                updatesettings('autosynchighscore', 'autosynchighscore=1\n')
+                autosynchighscore = True
+        else: # Button is turned off
+            if autosynchighscore: # If automatic syncing isn't already disabled
+                updatesettings('autosynchighscore', 'autosynchighscore=0\n')
+                autosynchighscore = False
 
         # Back button in bottom right
         if backbutton.draw():
