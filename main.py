@@ -813,6 +813,8 @@ heavyguardcardsprite = pygame.image.load(Path('Cards/heavyguardcard.png'))
 doublestrikecardsprite = pygame.image.load(Path('Cards/doublestrikecard.png'))
 claimsprite = pygame.image.load(Path('Sprites/claimsprite.png'))
 claimspritehover = pygame.image.load(Path('Sprites/claimspritehover.png'))
+plussprite = pygame.image.load(Path('Sprites/plus.png'))
+plusspritehover = pygame.image.load(Path('Sprites/plushover.png'))
 
 
 # ========== Dictionaries ==========
@@ -895,6 +897,7 @@ if autosynchighscore:
     autosyncbutton.toggle = True
 else:
     autosyncbutton.toggle = False
+addfriendsbutton = Button(width*33/40, height*4/10, plussprite, plusspritehover, width/960)
 
 
 # Textbox Instances
@@ -947,6 +950,8 @@ autosynctextpos = (width/20, height*14/20)
 # Friends Menu
 friendsmenutitle = settingstitlefont.render('Friends Menu', True, white) # Uses same font as settings
 friendsmenutitlepos = (width/20, height/20)
+addfriendsmenutitle = settingstitlefont.render('Add Friends Menu', True, white) # Uses same font as settings
+addfriendsmenutitlepos = (width/20, height/20)
 
 # Combat Menu
 infobox = pygame.Rect((width*11/20, 0), (width*9/20, height*49/100))
@@ -1219,6 +1224,10 @@ while run:
         # Background box and title
         pygame.draw.rect(screen, black, backgroundbox)
         screen.blit(friendsmenutitle, friendsmenutitlepos)
+
+        # Add friends button
+        if addfriendsbutton.draw():
+            state = 14 # Add friends menu
 
         # Back button in bottom right
         if backbutton.draw():
@@ -1621,6 +1630,18 @@ while run:
 
         if mapscreenbackbutton.draw():
             state = 5
+
+
+    elif state == 14: # Add friends menu
+        drawmainmenubackground()
+
+        # Background box and title
+        pygame.draw.rect(screen, black, backgroundbox)
+        screen.blit(addfriendsmenutitle, addfriendsmenutitlepos)
+
+        # Back button in bottom right
+        if backbutton.draw():
+            state = 3  # Return to friends menu
 
 
 
