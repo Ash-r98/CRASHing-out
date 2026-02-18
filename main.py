@@ -1,8 +1,8 @@
 import pygame
 from pathlib import Path
-from time import sleep
 from random import randint, shuffle, choice
 from datetime import datetime, timedelta
+import psycopg2
 
 pygame.init()
 pygame.display.set_caption('CRASHing out')
@@ -1041,7 +1041,29 @@ while run:
         # Draw login confirmation button
         if username != '' and password != '':
             if loginconfirmbutton.draw():
-                # Future account login/creation code
+                try:
+                    con = psycopg2.connect("host=ip.stevens-server.co.uk port=6767 user=postgres password=ballotmixtureclash")
+                    cursor = con.cursor()
+                    cursor.execute("""
+                        SELECT username
+                        FROM usertable
+                        WHERE username = %s
+                    """, (username,))
+                    print(cursor.fetchone())
+
+                    # Username found
+                    if cursor.fetchone() != None:
+                        pass
+                    else: # Username not found
+                        print('test')
+                        cursor.execute("""
+                            INSERT INTO usertable (username, password, highscore, friendslist, receivedfriendrequests) VALUES (%s, %s, %s, %s, %s)
+                        """, (username, password, 0, [], []))
+                        con.commit()
+
+                except:  # If connection fails
+                    pass
+
                 state = 1
 
         # Press enter warning text
