@@ -727,6 +727,9 @@ enemymovenumberfont = pygame.font.Font(fontname, enemymovenumberfontsize)
 deathscreenscorefontsize = int(70*(width/960))
 deathscreenscorefont = pygame.font.Font(fontname, deathscreenscorefontsize)
 
+settingsfontsize = int(50*(width/960))
+settingsfont = pygame.font.Font(fontname, settingsfontsize)
+
 
 # Colours
 white = (255, 255, 255)
@@ -848,6 +851,7 @@ startcombatbutton = Button(width*1/8, height*3/4, playsprite, playspritehover, w
 mapscreenbackbutton = Button(width*6/8, height*3/4, backsprite, backspritehover, width/960)
 rewardcontinuebutton = Button(width*7/8, height*1/16, playsprite, playspritehover, width/960)
 claimbutton = Button(width*1/32, height*7/20, claimsprite, claimspritehover, width/960)
+hardmodebutton = ToggleButton(width*4/8, height*5/20, xsprite, xspritehover, ticksprite, tickspritehover, width/1920)
 
 
 # Textbox Instances
@@ -875,6 +879,14 @@ quitconfirmtextpos = (width/5, height*2/5)
 backgroundbox = pygame.Rect((width/20, height/20), (width*9/10, height*9/10))
 settingsmenutitle = settingstitlefont.render('Settings Menu', True, white)
 settingsmenutitlepos = (width/20, height/20)
+hardmodetext = settingsfont.render('Hard Mode:', True, white)
+hardmodetextpos = (width/20, height*5/20)
+resolutiontext = settingsfont.render('Window Width:', True, white)
+resolutiontextpos = (width/20, height*8/20)
+volumetext = settingsfont.render('Volume:', True, white)
+volumetextpos = (width/20, height*11/20)
+autosynctext = settingsfont.render('Auto sync with server:', True, white)
+autosynctextpos = (width/20, height*14/20)
 
 # Friends Menu
 friendsmenutitle = settingstitlefont.render('Friends Menu', True, white) # Uses same font as settings
@@ -1031,6 +1043,22 @@ while run:
         # Background box and title
         pygame.draw.rect(screen, black, backgroundbox)
         screen.blit(settingsmenutitle, settingsmenutitlepos)
+
+        # Options
+
+        # Hard Mode
+        screen.blit(hardmodetext, hardmodetextpos)
+        if hardmodebutton.draw():
+            pass
+
+        # Resolution
+        screen.blit(resolutiontext, resolutiontextpos)
+
+        # Volume
+        screen.blit(volumetext, volumetextpos)
+
+        # Auto Sync
+        screen.blit(autosynctext, autosynctextpos)
 
         # Back button in bottom right
         if backbutton.draw():
