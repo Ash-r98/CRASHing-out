@@ -462,6 +462,7 @@ class Enemy:
             'disguise': False
         }
         self.floorscale(player.floor)
+        self.hardmodescale()
 
     def render(self): # Draws enemy sprite to screen during combat
         # If non-idle sprite for 1 second, change back to idle sprite
@@ -577,6 +578,14 @@ class Enemy:
         self.basedamage = int(self.basedamage * scalar)
         self.specialdamage = int(self.specialdamage * scalar)
         self.defendamount = int(self.defendamount * scalar)
+
+    def hardmodescale(self):
+        if hardmode:
+            self.maxhealth *= 2
+            self.health = self.maxhealth
+            self.basedamage *= 2
+            self.specialdamage *= 2
+            self.defendamount *= 2
 
 
 # Player Class
@@ -839,6 +848,7 @@ rewarddict = {
     'resist1': ['Gain 1 resist', 'Increase all block gained by 1'],
     'maxenergy1': ['Max Energy +1', 'Gain 1 maximum energy']
 }
+nothingreward = ['Nothing', 'No reward']
 
 
 # Character Instances
@@ -1230,18 +1240,34 @@ while run:
                 stage = i + 1
                 firstenemy = choice(list(enemydict.items()))[1]
                 firstreward = choice(list(rewarddict.items()))[1]
+                if hardmode:
+                    nothingrewardrandom = randint(1, 10)
+                    if nothingrewardrandom == 1:
+                        firstreward = nothingreward
+
                 levels[2 * i] = Level(firstenemy, firstreward, stage)
 
                 secondenemy = choice(list(enemydict.items()))[1]
                 while secondenemy[0] == firstenemy[0]: # Re-randomise until different
                     secondenemy = choice(list(enemydict.items()))[1]
+
                 secondreward = choice(list(rewarddict.items()))[1]
+                if hardmode:
+                    nothingrewardrandom = randint(1, 10)
+                    if nothingrewardrandom == 1:
+                        secondreward = nothingreward
                 while secondreward[0] == firstreward[0]: # Re-randomise until different
                     secondreward = choice(list(rewarddict.items()))[1]
+
                 levels[2 * i + 1] = Level(secondenemy, secondreward, stage)
 
             # Boss generator
-            levels[4] = Level(choice(list(bossdict.items()))[1], choice(list(rewarddict.items()))[1], 3)
+            bossreward = choice(list(rewarddict.items()))[1]
+            if hardmode:
+                nothingrewardrandom = randint(1, 25) # Boss nothing rewards are much rarer
+                if nothingrewardrandom == 1:
+                    bossreward = nothingreward
+            levels[4] = Level(choice(list(bossdict.items()))[1], bossreward, 3)
 
 
         if player.floorstage == 1:
@@ -1455,7 +1481,13 @@ while run:
             newreward = False # Only runs once
             rewardclaimed = False # Can only claim reward once
             cardrewardclaimed = False # Can only claim card reward once
-            player.score += player.floorstage * 100 + (player.floor - 1) * 50
+
+            # Score
+            scoreincrease = player.floorstage * 100 + (player.floor - 1) * 50
+            if hardmode:
+                scoreincrease = int(scoreincrease * 2)
+            player.score += scoreincrease
+
             player.floorstage += 1
             if player.floorstage > 3:
                 player.newfloor = True
