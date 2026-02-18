@@ -3,6 +3,7 @@ from pathlib import Path
 from random import randint, shuffle, choice
 from datetime import datetime, timedelta
 import psycopg2
+import hashlib
 
 pygame.init()
 pygame.display.set_caption('CRASHing out')
@@ -759,8 +760,8 @@ deathscreenscorefont = pygame.font.Font(fontname, deathscreenscorefontsize)
 settingsfontsize = int(50*(width/960))
 settingsfont = pygame.font.Font(fontname, settingsfontsize)
 
-resolutionwarningfontsize = int(30*(width/960))
-resolutionwarningfont = pygame.font.Font(fontname, resolutionwarningfontsize)
+warningfontsize = int(30*(width/960))
+warningfont = pygame.font.Font(fontname, warningfontsize)
 
 
 # Colours
@@ -915,8 +916,10 @@ usernametext = loginlabelfont.render('Username:', True, green)
 usernametextpos = (width/96, height*7/20)
 passwordtext = loginlabelfont.render('Password:', True, green)
 passwordtextpos = (width/96, height*6/10)
-pressenterwarningtext = resolutionwarningfont.render('(press enter to submit)', True, white)
+pressenterwarningtext = warningfont.render('(press enter to submit)', True, white)
 pressenterwarningtextpos = (width*41/80, height*41/80)
+loginloadingtext = warningfont.render('Loading...', True, white)
+loginloadingtextpos = (width/10, height*7/8)
 
 # Main Menu
 quitconfirmbox = pygame.Rect((width/6, height*2/5), (width*2/3, height/5))
@@ -931,8 +934,8 @@ hardmodetext = settingsfont.render('Hard Mode:', True, white)
 hardmodetextpos = (width/20, height*5/20)
 resolutiontext = settingsfont.render('Window Width:', True, white)
 resolutiontextpos = (width/20, height*8/20)
-resolutionwarningtext = resolutionwarningfont.render(('(restart game)'), True, red)
-resolutionwarningtextpos = (width*13/20, height*17/40)
+warningtext = warningfont.render(('(restart game)'), True, red)
+warningtextpos = (width*13/20, height*17/40)
 volumetext = settingsfont.render('Volume:', True, white)
 volumetextpos = (width/20, height*11/20)
 autosynctext = settingsfont.render('Auto sync with server:', True, white)
@@ -1042,6 +1045,8 @@ while run:
         if username != '' and password != '':
             if loginconfirmbutton.draw():
                 try:
+                    screen.blit(loginloadingtext, loginloadingtextpos)
+                    pygame.display.update()
                     con = psycopg2.connect("host=ip.stevens-server.co.uk port=6767 user=postgres password=ballotmixtureclash")
                     cursor = con.cursor()
                     cursor.execute("""
@@ -1049,22 +1054,31 @@ while run:
                         FROM usertable
                         WHERE username = %s
                     """, (username,))
-                    print(cursor.fetchone())
 
                     # Username found
                     if cursor.fetchone() != None:
-                        pass
+                        hashpassword = hashlib.sha256(password.encode()).hexdigest()
+                        cursor.execute("""
+                            SELECT password
+                            FROM usertable
+                            WHERE username = %s
+                        """, (username,)) # There can be multiple identical passwords but not usernames
+                        if hashpassword == cursor.fetchone()[0]: # If password is correct
+                            state = 1
+                        else: # If password is incorrect
+                            print("Wrong password")
+
                     else: # Username not found
-                        print('test')
+                        hashpassword = hashlib.sha256(password.encode()).hexdigest()
+                        print(hashpassword)
                         cursor.execute("""
                             INSERT INTO usertable (username, password, highscore, friendslist, receivedfriendrequests) VALUES (%s, %s, %s, %s, %s)
-                        """, (username, password, 0, [], []))
+                        """, (username, hashpassword, 0, [], []))
                         con.commit()
+                        state = 1
 
                 except:  # If connection fails
-                    pass
-
-                state = 1
+                    state = 1
 
         # Press enter warning text
         screen.blit(pressenterwarningtext, pressenterwarningtextpos)
@@ -1149,7 +1163,7 @@ while run:
             except: # Reset to old value
                 resolutiontextbox.finaltext = str(width)
         # Restart game warning
-        screen.blit(resolutionwarningtext, resolutionwarningtextpos)
+        screen.blit(warningtext, warningtextpos)
 
         # Volume
         screen.blit(volumetext, volumetextpos)
