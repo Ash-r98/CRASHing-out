@@ -1131,6 +1131,10 @@ while run:
             if quitbutton.draw():
                 quitconfirm = True # Enable confirmation box
 
+            # Username display
+            if username != None:
+                textdisplay(f'User: {username}', (0, height-70*(width/960)), 70*(width/960))
+
 
 
     # Settings menu
