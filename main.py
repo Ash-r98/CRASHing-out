@@ -902,9 +902,11 @@ volumetextbox.finaltext = str(volume)
 logintitle = titlefont.render('Login Menu', True, green)
 logintitlepos = (width/2-(titlefontsize*3), height*1/10)
 usernametext = loginlabelfont.render('Username:', True, green)
-usernametextpos = (10, height*7/20)
+usernametextpos = (width/96, height*7/20)
 passwordtext = loginlabelfont.render('Password:', True, green)
-passwordtextpos = (10, height*6/10)
+passwordtextpos = (width/96, height*6/10)
+pressenterwarningtext = resolutionwarningfont.render('(press enter to submit)', True, white)
+pressenterwarningtextpos = (width*41/80, height*41/80)
 
 # Main Menu
 quitconfirmbox = pygame.Rect((width/6, height*2/5), (width*2/3, height/5))
@@ -1031,6 +1033,9 @@ while run:
             if loginconfirmbutton.draw():
                 # Future account login/creation code
                 state = 1
+
+        # Press enter warning text
+        screen.blit(pressenterwarningtext, pressenterwarningtextpos)
 
         #textdisplay(username, (0, 0), 100)
         #textdisplay(password, (0, 70), 100)
@@ -1314,6 +1319,10 @@ while run:
             player.energy = player.maxenergy
         if enemy.health > enemy.maxhealth:
             enemy.health = enemy.maxhealth
+        player.health = int(player.health)
+        player.maxhealth = int(player.maxhealth)
+        enemy.health = int(enemy.health)
+        enemy.maxhealth = int(enemy.maxhealth)
 
         # Runs at the start of each turn
         if turnstart:
