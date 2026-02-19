@@ -8,6 +8,8 @@ import hashlib
 pygame.init()
 pygame.display.set_caption('CRASHing out')
 
+server = "host=ip.stevens-server.co.uk port=6767 user=postgres password=ballotmixtureclash"
+
 # Backup variables
 width = None
 height = None
@@ -960,6 +962,12 @@ addfriendtext = addfriendfont.render('Add friend:', True, white)
 addfriendtextpos = (width/20, height*2/10)
 yourrequeststext = addfriendfont.render('Friend requests:', True, white)
 yourrequeststextpos = (width/20, height*7/20)
+requestloadingtext = warningfont.render('Loading...', True, white)
+requestloadingtextpos = (width*12/20, height*3/10)
+requestusernotfoundtext = warningfont.render('User not found', True, red)
+requestusernotfoundtextpos = (width*11/20, height*3/10)
+requestuserfoundtext = warningfont.render('Request sent!', True, green)
+requestuserfoundtextpos = (width*11/20, height*3/10)
 
 # Combat Menu
 infobox = pygame.Rect((width*11/20, 0), (width*9/20, height*49/100))
@@ -1012,6 +1020,11 @@ rewardclaimed = False
 cardrewardclaimed = False
 
 
+# Friends menu variables
+requestuserfoundflag = False
+requestusernotfoundflag = False
+
+
 # Character backup variable
 character = None
 
@@ -1033,6 +1046,8 @@ chrselectnow = datetime.now()
 prevchrselectnow = datetime.now()
 prevplayedcardnow = datetime.now()
 combatbackbuttonnow = datetime.now()
+requestuserfoundnow = datetime.now()
+requestusernotfoundnow = datetime.now()
 
 # Devmode variables
 toggledev = False
@@ -1068,7 +1083,7 @@ while run:
                 try:
                     screen.blit(loginloadingtext, loginloadingtextpos)
                     pygame.display.update()
-                    con = psycopg2.connect("host=ip.stevens-server.co.uk port=6767 user=postgres password=ballotmixtureclash")
+                    con = psycopg2.connect(server)
                     cursor = con.cursor()
                     cursor.execute("""
                         SELECT username
@@ -1654,9 +1669,72 @@ while run:
 
         # Send friend request textbox
         screen.blit(addfriendtext, addfriendtextpos)
-        if addfriendtextbox.draw() != None:
+        request = addfriendtextbox.draw()
+        if request != None:
             # Add friend code
-            pass
+            try:
+                screen.blit(requestloadingtext, requestloadingtextpos)
+                pygame.display.update()
+                con = psycopg2.connect(server)
+                cursor = con.cursor()
+                cursor.execute("""
+                    SELECT id
+                    FROM usertable
+                    WHERE username = %s
+                """, (request,))
+                result = cursor.fetchone()
+
+                if result == None: # User does not exist
+                    requestuserfoundflag = False
+                    requestusernotfoundflag = True
+                    requestusernotfoundnow = datetime.now()
+                else: # User found
+                    requestid = result[0]
+                    requestusernotfoundflag = False
+                    requestuserfoundflag = True
+                    requestuserfoundnow = datetime.now()
+
+                    # Update user's request list
+                    cursor.execute("""
+                        SELECT receivedfriendrequests
+                        FROM usertable
+                        WHERE id = %s
+                    """, (requestid,))
+                    requestlist = cursor.fetchone()[0]
+
+                    # Fetch player's own id
+                    cursor.execute("""
+                        SELECT id
+                        FROM usertable
+                        WHERE username = %s
+                    """, (username,))
+                    selfid = cursor.fetchone()[0]
+
+                    requestlist.append(selfid)
+                    print(requestlist, requestid)
+
+                    # Update user's friend request list with new list
+                    cursor.execute("""
+                        UPDATE usertable
+                        SET receivedfriendrequests = %s
+                        WHERE id = %s
+                    """, (requestlist, requestid))
+                    con.commit()
+
+            except:
+                pass
+
+        # User found text
+        if requestuserfoundflag:
+            screen.blit(requestuserfoundtext, requestuserfoundtextpos)
+            if datetime.now() - requestuserfoundnow > timedelta(milliseconds=1000):
+                requestuserfoundflag = False
+
+        # User not found text
+        if requestusernotfoundflag:
+            screen.blit(requestusernotfoundtext, requestusernotfoundtextpos)
+            if datetime.now() - requestusernotfoundnow > timedelta(milliseconds=1000):
+                requestusernotfoundflag = False
 
         # Received friend requests
         screen.blit(yourrequeststext, yourrequeststextpos)
