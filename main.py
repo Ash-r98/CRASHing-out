@@ -1780,7 +1780,6 @@ while run:
                     WHERE username = %s
                 """, (username,))
                 selfrequestidlist = cursor.fetchone()[0][:3] # Only displays the first 3
-                print(selfrequestidlist)
 
                 selfrequestnamelist = []
                 for i in range(len(selfrequestidlist)):
@@ -1791,7 +1790,6 @@ while run:
                     """, (selfrequestidlist[i],))
                     name = cursor.fetchone()[0]
                     selfrequestnamelist.append(name)
-                print(selfrequestnamelist)
 
             except:
                 pass
@@ -1809,6 +1807,61 @@ while run:
 
             if acceptbutton.drawnobuffer():
                 initialloadrequests = True
+                try:
+                    screen.blit(removerequestloadingtext, removerequestloadingtextpos)
+                    pygame.display.update()
+
+                    con = psycopg2.connect(server)
+                    cursor = con.cursor()
+                    # Fetch old friend list and friend request list
+                    cursor.execute("""
+                        SELECT friendslist, receivedfriendrequests
+                        FROM usertable
+                        WHERE username = %s
+                    """, (username,))
+                    results = cursor.fetchall()[0]
+                    friendlist = results[0]
+                    newselfrequestidlist = results[1]
+                    friendid = selfrequestidlist[i]
+                    newselfrequestidlist.remove(friendid) # Remove the accepted request id
+                    friendlist.append(friendid) # Add the accepted request id to friends list
+
+                    # Update self friend  and friend request lists with new lists
+                    cursor.execute("""
+                        UPDATE usertable
+                        SET receivedfriendrequests = %s, friendslist = %s
+                        WHERE username = %s
+                    """, (newselfrequestidlist, friendlist, username))
+
+                    # Fetch requesting player's old friend list
+                    cursor.execute("""
+                        SELECT friendslist
+                        FROM usertable
+                        WHERE id = %s
+                    """, (friendid,))
+                    otherfriendlist = cursor.fetchone()[0]
+
+                    # Fetch player's own id
+                    cursor.execute("""
+                        SELECT id
+                        FROM usertable
+                        WHERE username = %s
+                    """, (username,))
+                    selfid = cursor.fetchone()[0]
+
+                    # Update requesting player's friend list
+                    otherfriendlist.append(selfid)
+                    cursor.execute("""
+                        UPDATE usertable
+                        SET friendslist = %s
+                        WHERE id = %s
+                    """, (otherfriendlist, friendid))
+
+                    con.commit()
+
+                except:
+                    pass
+
             if declinebutton.drawnobuffer():
                 initialloadrequests = True
                 try:
@@ -1817,6 +1870,7 @@ while run:
 
                     con = psycopg2.connect(server)
                     cursor = con.cursor()
+                    # Fetch old friend request list
                     cursor.execute("""
                         SELECT receivedfriendrequests
                         FROM usertable
