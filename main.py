@@ -970,6 +970,8 @@ requestuserfoundtext = warningfont.render('Request sent!', True, green)
 requestuserfoundtextpos = (width*11/20, height*3/10)
 requestalreadysenttext = warningfont.render('Request already sent', True, white)
 requestalreadysenttextpos = (width*9/20, height*3/10)
+requestdisplayloadingtext = warningfont.render('Loading...', True, white)
+requestdisplayloadingtextpos = (width*2/20, height*5/10)
 
 # Combat Menu
 infobox = pygame.Rect((width*11/20, 0), (width*9/20, height*49/100))
@@ -1026,6 +1028,8 @@ cardrewardclaimed = False
 requestuserfoundflag = False
 requestusernotfoundflag = False
 requestalreadysentflag = False
+initialloadrequests = True
+selfrequestlist = []
 
 
 # Character backup variable
@@ -1253,6 +1257,9 @@ while run:
         # Background box and title
         pygame.draw.rect(screen, black, backgroundbox)
         screen.blit(friendsmenutitle, friendsmenutitlepos)
+
+        # Set flag to load friend requests when entering add friends menu
+        initialloadrequests = True
 
         # Render friend high scores
 
@@ -1752,8 +1759,33 @@ while run:
             if datetime.now() - requestalreadysentnow > timedelta(milliseconds=3000):
                 requestalreadysentflag = False
 
-        # Received friend requests
+        # Received friend requests text
         screen.blit(yourrequeststext, yourrequeststextpos)
+
+        # Fetch own friend requests
+        if initialloadrequests:
+            initialloadrequests = False # Only happens once
+            try:
+                screen.blit(requestdisplayloadingtext, requestdisplayloadingtextpos)
+                pygame.display.update()
+
+                con = psycopg2.connect(server)
+                cursor = con.cursor()
+                cursor.execute("""
+                    SELECT receivedfriendrequests
+                    FROM usertable
+                    WHERE username = %s
+                """, (username,))
+                selfrequestlist = cursor.fetchone()[0][:3] # Only displays the first 3
+                print(selfrequestlist)
+
+            except:
+                pass
+
+        # Display requests
+        for i in range(len(selfrequestlist)):
+            requestbackground = pygame.Rect((width*3/40, height*9/20 + (i * height/6)), (width*2/3, height/8))
+            pygame.draw.rect(screen, grey, requestbackground)
 
         # Back button in bottom right
         if backbutton.draw():
