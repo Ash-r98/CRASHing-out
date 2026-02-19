@@ -1095,6 +1095,7 @@ combatbackbuttonnow = datetime.now()
 requestuserfoundnow = datetime.now()
 requestusernotfoundnow = datetime.now()
 requestalreadysentnow = datetime.now()
+lastsyncnow = datetime.now()
 
 # Devmode variables
 toggledev = False
@@ -1772,6 +1773,8 @@ while run:
     elif state == 14: # Add friends menu
         drawmainmenubackground()
 
+        initialloadfriends = True  # Flag for loading friends in friends menu
+
         # Background box and title
         pygame.draw.rect(screen, black, backgroundbox)
         screen.blit(addfriendsmenutitle, addfriendsmenutitlepos)
@@ -1999,6 +2002,29 @@ while run:
 
 
 
+    # Automatic server high score syncing every 60 seconds or if the game loop is stopped
+    if connected and autosynchighscore and (datetime.now() - lastsyncnow >= timedelta(milliseconds=60000) or not run):
+        lastsyncnow = datetime.now()
+
+        try:
+            con = psycopg2.connect(server)
+            cursor = con.cursor()
+            cursor.execute("""
+                SELECT highscore
+                FROM usertable
+                WHERE username = %s
+            """, (username,))
+            serverhighscore = cursor.fetchone()[0]
+            if player.sessionhighscore > serverhighscore:
+                cursor.execute("""
+                    UPDATE usertable
+                    SET highscore = %s
+                    WHERE username = %s
+                """, (player.sessionhighscore, username))
+                con.commit()
+
+        except:
+            pass
 
 
 
