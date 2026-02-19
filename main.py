@@ -191,6 +191,26 @@ def updatesettings(setting, newline):
         settingsfile.writelines(settingsdata)
 
 
+def doublequicksort(comparelist, bonuslist): # Sorts both lists according to values in compare list
+    if len(comparelist) <= 1:
+        return comparelist, bonuslist
+    comparepivot = comparelist[0]
+    bonuspivot = bonuslist[0]
+    comparelower = []
+    comparehigher = []
+    bonuslower = []
+    bonushigher = []
+    for i in range(1, len(comparelist)):
+        if comparelist[i] < comparepivot:
+            comparelower.append(comparelist[i])
+            bonuslower.append(bonuslist[i])
+        else:
+            comparehigher.append(comparelist[i])
+            bonushigher.append(bonuslist[i])
+    return doublequicksort(comparelower, bonuslower)[0] + [comparepivot] + doublequicksort(comparehigher,
+    bonushigher)[0], doublequicksort(comparelower, bonuslower)[1] + [bonuspivot] + doublequicksort(comparehigher, bonushigher)[1]
+
+
 
 # ========== Classes ==========
 
@@ -1030,6 +1050,10 @@ cardrewardclaimed = False
 requestuserfoundflag = False
 requestusernotfoundflag = False
 requestalreadysentflag = False
+initialloadfriends = True
+selffriendidlist = []
+selffriendnamelist = []
+friendhighscorelist = []
 initialloadrequests = True
 selfrequestidlist = []
 selfrequestnamelist = []
@@ -1142,6 +1166,8 @@ while run:
     # Main menu
     elif state == 1:
         drawmainmenubackground()
+
+        initialloadfriends = True # Flag for loading friends in friends menu
 
         if quitconfirm:
             # Confirmation box
@@ -1264,12 +1290,57 @@ while run:
         # Set flag to load friend requests when entering add friends menu
         initialloadrequests = True
 
+        # Load friend scores
+        if initialloadfriends:
+            initialloadfriends = False
+            try:
+                screen.blit(requestdisplayloadingtext, requestdisplayloadingtextpos)
+                pygame.display.update()
+
+                con = psycopg2.connect(server)
+                cursor = con.cursor()
+                cursor.execute("""
+                    SELECT friendslist, highscore
+                    FROM usertable
+                    WHERE username = %s
+                """, (username,))
+                results = cursor.fetchall()[0]
+                selffriendidlist = results[0][:10] # Only displays the first 10
+                selfhighscore = results[1]
+
+                selffriendnamelist = []
+                friendhighscorelist = []
+                for i in range(len(selffriendidlist)):
+                    cursor.execute("""
+                        SELECT username, highscore
+                        FROM usertable
+                        WHERE id = %s
+                    """, (selffriendidlist[i],))
+                    friendresults = cursor.fetchall()[0]
+                    name = friendresults[0]
+                    selffriendnamelist.append(name)
+                    friendhighscore = friendresults[1]
+                    friendhighscorelist.append(friendhighscore)
+
+                # Sort friend and player high scores
+                highscorelist = friendhighscorelist + [selfhighscore]
+                namelist = selffriendnamelist + [username]
+                highscorelist, namelist = doublequicksort(highscorelist, namelist)
+                highscorelist = highscorelist[:10]
+                namelist = namelist[:10]
+
+            except:
+                pass
+
         # Render friend high scores
+        if connected:
+            pass
 
 
         # Add friends button
-        if addfriendsbutton.draw():
-            state = 14 # Add friends menu
+        if connected:
+            if addfriendsbutton.draw():
+                state = 14 # Add friends menu
 
         # Back button in bottom right
         if backbutton.draw():
