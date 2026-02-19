@@ -1029,7 +1029,8 @@ requestuserfoundflag = False
 requestusernotfoundflag = False
 requestalreadysentflag = False
 initialloadrequests = True
-selfrequestlist = []
+selfrequestidlist = []
+selfrequestnamelist = []
 
 
 # Character backup variable
@@ -1776,16 +1777,39 @@ while run:
                     FROM usertable
                     WHERE username = %s
                 """, (username,))
-                selfrequestlist = cursor.fetchone()[0][:3] # Only displays the first 3
-                print(selfrequestlist)
+                selfrequestidlist = cursor.fetchone()[0][:3] # Only displays the first 3
+                print(selfrequestidlist)
+
+                selfrequestnamelist = []
+                for i in range(len(selfrequestidlist)):
+                    cursor.execute("""
+                        SELECT username
+                        FROM usertable
+                        WHERE id = %s
+                    """, (selfrequestidlist[i],))
+                    name = cursor.fetchone()[0]
+                    selfrequestnamelist.append(name)
+                print(selfrequestnamelist)
 
             except:
                 pass
 
         # Display requests
-        for i in range(len(selfrequestlist)):
-            requestbackground = pygame.Rect((width*3/40, height*9/20 + (i * height/6)), (width*2/3, height/8))
+        for i in range(len(selfrequestnamelist)):
+            # Background
+            requestbackground = pygame.Rect((width*3/40, height*9/20 + (i * height/6)), (width*3/4-width/96, height/8))
             pygame.draw.rect(screen, grey, requestbackground)
+            # Text
+            textdisplay(selfrequestnamelist[i], (width*3/40, height*9/20 + (i * height/6)), height/8)
+            # Buttons
+            acceptbutton = Button(width*8/12, (height*9/20 + (i * height/6)) + 10 * width/1920, ticksprite, tickspritehover, width/1920)
+            declinebutton = Button(width*9/12, (height*9/20 + (i * height/6)) + 10 * width/1920, xsprite, xspritehover, width/1920)
+
+            if acceptbutton.drawnobuffer():
+                initialloadrequests = True
+            if declinebutton.drawnobuffer():
+                initialloadrequests = True
+
 
         # Back button in bottom right
         if backbutton.draw():
