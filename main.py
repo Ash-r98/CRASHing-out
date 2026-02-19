@@ -1001,6 +1001,8 @@ requestuserfoundtext = warningfont.render('Request sent!', True, green)
 requestuserfoundtextpos = (width*11/20, height*3/10)
 requestalreadysenttext = warningfont.render('Request already sent', True, white)
 requestalreadysenttextpos = (width*9/20, height*3/10)
+alreadyfriendtext = warningfont.render('Already friends', True, white)
+alreadyfriendtextpos = (width*9/20, height*3/10)
 requestdisplayloadingtext = warningfont.render('Loading...', True, white)
 requestdisplayloadingtextpos = (width*2/20, height*5/10)
 removerequestloadingtext = warningfont.render('Loading...', True, white)
@@ -1063,6 +1065,7 @@ cardrewardclaimed = False
 requestuserfoundflag = False
 requestusernotfoundflag = False
 requestalreadysentflag = False
+alreadyfriendflag = False
 initialloadfriends = True
 selffriendidlist = []
 selffriendnamelist = []
@@ -1098,6 +1101,7 @@ combatbackbuttonnow = datetime.now()
 requestuserfoundnow = datetime.now()
 requestusernotfoundnow = datetime.now()
 requestalreadysentnow = datetime.now()
+alreadyfriendnow = datetime.now()
 lastsyncnow = datetime.now()
 
 # Devmode variables
@@ -1825,21 +1829,25 @@ while run:
 
                 if result == None: # User does not exist
                     requestuserfoundflag = False
+                    alreadyfriendflag = False
                     requestusernotfoundflag = True
                     requestusernotfoundnow = datetime.now()
                 else: # User found
                     requestid = result[0]
                     requestusernotfoundflag = False
+                    alreadyfriendflag = False
                     requestuserfoundflag = True
                     requestuserfoundnow = datetime.now()
 
                     # Update user's request list
                     cursor.execute("""
-                        SELECT receivedfriendrequests
+                        SELECT friendslist, receivedfriendrequests
                         FROM usertable
                         WHERE id = %s
                     """, (requestid,))
-                    requestlist = cursor.fetchone()[0]
+                    results = cursor.fetchall()[0]
+                    theirfriendlist = results[0]
+                    requestlist = results[1]
 
                     # Fetch player's own id
                     cursor.execute("""
@@ -1850,7 +1858,7 @@ while run:
                     selfid = cursor.fetchone()[0]
 
                     # Validation
-                    if selfid not in requestlist:
+                    if selfid not in requestlist and selfid not in theirfriendlist:
                         requestlist.append(selfid)
 
                         # Update user's friend request list with new list
@@ -1860,11 +1868,16 @@ while run:
                             WHERE id = %s
                         """, (requestlist, requestid))
                         con.commit()
-
-                    else: # If user already sent a request
+                    elif selfid in requestlist: # If user already sent a request
                         requestuserfoundflag = False
+                        alreadyfriendflag = False
                         requestalreadysentflag = True
                         requestalreadysentnow = datetime.now()
+                    elif selfid in theirfriendlist: # If user is already friends with other user
+                        requestuserfoundflag = False
+                        alreadyfriendflag = True
+                        requestalreadysentflag = False
+                        alreadyfriendnow = datetime.now()
 
             except:
                 pass
@@ -1886,6 +1899,12 @@ while run:
             screen.blit(requestalreadysenttext, requestalreadysenttextpos)
             if datetime.now() - requestalreadysentnow > timedelta(milliseconds=3000):
                 requestalreadysentflag = False
+
+        # Already friends text
+        if alreadyfriendflag:
+            screen.blit(alreadyfriendtext, alreadyfriendtextpos)
+            if datetime.now() - alreadyfriendnow > timedelta(milliseconds=3000):
+                alreadyfriendflag = False
 
         # Received friend requests text
         screen.blit(yourrequeststext, yourrequeststextpos)
@@ -2030,7 +2049,7 @@ while run:
 
 
     # Automatic server high score syncing every 60 seconds or if the game loop is stopped
-    if connected and autosynchighscore and (datetime.now() - lastsyncnow >= timedelta(milliseconds=60000) or not run):
+    if connected and autosynchighscore and (datetime.now() - lastsyncnow >= timedelta(milliseconds=5000) or not run):
         lastsyncnow = datetime.now()
 
         try:
