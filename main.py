@@ -848,6 +848,8 @@ claimsprite = pygame.image.load(Path('Sprites/claimsprite.png'))
 claimspritehover = pygame.image.load(Path('Sprites/claimspritehover.png'))
 plussprite = pygame.image.load(Path('Sprites/plus.png'))
 plusspritehover = pygame.image.load(Path('Sprites/plushover.png'))
+uploadsprite = pygame.image.load(Path('Sprites/uploadsprite.png'))
+uploadspritehover = pygame.image.load(Path('Sprites/uploadspritehover.png'))
 
 
 # ========== Dictionaries ==========
@@ -931,6 +933,7 @@ if autosynchighscore:
 else:
     autosyncbutton.toggle = False
 addfriendsbutton = Button(width*33/40, height*4/10, plussprite, plusspritehover, width/960)
+manualsyncbutton = Button(width*33/40, height*1/10, uploadsprite, uploadspritehover, width/960)
 
 
 # Textbox Instances
@@ -1358,10 +1361,34 @@ while run:
                     textdisplay(f'{i+1}. {namelist[i]} - {highscorelist[i]}', (width/20, height*39/80+((i-3)*height/15)), 40*width/960)
 
 
-        # Add friends button
+        # Add friends button and manual sync button
         if connected:
             if addfriendsbutton.draw():
                 state = 14 # Add friends menu
+
+            if manualsyncbutton.draw():
+                initialloadfriends = True # Will always reload high scores on current page to match new sync
+                try:
+                    con = psycopg2.connect(server)
+                    cursor = con.cursor()
+                    cursor.execute("""
+                        SELECT highscore
+                        FROM usertable
+                        WHERE username = %s
+                    """, (username,))
+                    serverhighscore = cursor.fetchone()[0]
+
+                    # If new high score is larger then update server
+                    if player.sessionhighscore > serverhighscore:
+                        cursor.execute("""
+                            UPDATE usertable
+                            SET highscore = %s
+                            WHERE username = %s
+                        """, (player.sessionhighscore, username))
+                        con.commit()
+
+                except:
+                    pass
 
         # Not connected text
         if not connected:
@@ -2015,6 +2042,8 @@ while run:
                 WHERE username = %s
             """, (username,))
             serverhighscore = cursor.fetchone()[0]
+
+            # If new high score is larger then update server
             if player.sessionhighscore > serverhighscore:
                 cursor.execute("""
                     UPDATE usertable
