@@ -972,6 +972,8 @@ requestalreadysenttext = warningfont.render('Request already sent', True, white)
 requestalreadysenttextpos = (width*9/20, height*3/10)
 requestdisplayloadingtext = warningfont.render('Loading...', True, white)
 requestdisplayloadingtextpos = (width*2/20, height*5/10)
+removerequestloadingtext = warningfont.render('Loading...', True, white)
+removerequestloadingtextpos = (width*13/20, height*7/20)
 
 # Combat Menu
 infobox = pygame.Rect((width*11/20, 0), (width*9/20, height*49/100))
@@ -1809,6 +1811,30 @@ while run:
                 initialloadrequests = True
             if declinebutton.drawnobuffer():
                 initialloadrequests = True
+                try:
+                    screen.blit(removerequestloadingtext, removerequestloadingtextpos)
+                    pygame.display.update()
+
+                    con = psycopg2.connect(server)
+                    cursor = con.cursor()
+                    cursor.execute("""
+                        SELECT receivedfriendrequests
+                        FROM usertable
+                        WHERE username = %s
+                    """, (username,))
+                    newselfrequestidlist = cursor.fetchone()[0]
+                    newselfrequestidlist.remove(selfrequestidlist[i]) # Remove the declined request id
+
+                    # Update user's friend request list with new list
+                    cursor.execute("""
+                        UPDATE usertable
+                        SET receivedfriendrequests = %s
+                        WHERE username = %s
+                    """, (newselfrequestidlist, username))
+                    con.commit()
+
+                except:
+                    pass
 
 
         # Back button in bottom right
