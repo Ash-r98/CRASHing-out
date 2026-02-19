@@ -798,6 +798,9 @@ blue = (0, 0, 255) # Not using this one
 darkgrey = (50, 50, 50)
 grey = (75, 75, 75)
 lightgrey = (100, 100, 100)
+gold = (212, 175, 55)
+silver = (165, 169, 180)
+bronze = (205, 127, 50)
 
 
 
@@ -994,6 +997,8 @@ requestdisplayloadingtext = warningfont.render('Loading...', True, white)
 requestdisplayloadingtextpos = (width*2/20, height*5/10)
 removerequestloadingtext = warningfont.render('Loading...', True, white)
 removerequestloadingtextpos = (width*13/20, height*7/20)
+notconnectedtext = warningfont.render('Not connected to server', True, white)
+notconnectedtextpos = (width*1/5, height*9/20)
 
 # Combat Menu
 infobox = pygame.Rect((width*11/20, 0), (width*9/20, height*49/100))
@@ -1291,7 +1296,7 @@ while run:
         initialloadrequests = True
 
         # Load friend scores
-        if initialloadfriends:
+        if initialloadfriends and connected:
             initialloadfriends = False
             try:
                 screen.blit(requestdisplayloadingtext, requestdisplayloadingtextpos)
@@ -1341,6 +1346,10 @@ while run:
         if connected:
             if addfriendsbutton.draw():
                 state = 14 # Add friends menu
+
+        # Not connected text
+        if not connected:
+            screen.blit(notconnectedtext, notconnectedtextpos)
 
         # Back button in bottom right
         if backbutton.draw():
