@@ -763,6 +763,9 @@ settingsfont = pygame.font.Font(fontname, settingsfontsize)
 warningfontsize = int(30*(width/960))
 warningfont = pygame.font.Font(fontname, warningfontsize)
 
+addfriendfontsize = int(50*(width/960))
+addfriendfont = pygame.font.Font(fontname, addfriendfontsize)
+
 
 # Colours
 white = (255, 255, 255)
@@ -907,6 +910,7 @@ resolutiontextbox = Textbox(width*10/20, height*8/20, width/8, settingsfontsize,
 resolutiontextbox.finaltext = str(width)
 volumetextbox = Textbox(width*6/20, height*11/20, width/8, settingsfontsize, darkgrey, grey, lightgrey, white)
 volumetextbox.finaltext = str(volume)
+addfriendtextbox = Textbox(width*4/10, height*2/10, width/2, addfriendfontsize, darkgrey, grey, lightgrey, white)
 
 
 
@@ -952,6 +956,10 @@ friendsmenutitle = settingstitlefont.render('Friends Menu', True, white) # Uses 
 friendsmenutitlepos = (width/20, height/20)
 addfriendsmenutitle = settingstitlefont.render('Add Friends Menu', True, white) # Uses same font as settings
 addfriendsmenutitlepos = (width/20, height/20)
+addfriendtext = addfriendfont.render('Add friend:', True, white)
+addfriendtextpos = (width/20, height*2/10)
+yourrequeststext = addfriendfont.render('Friend requests:', True, white)
+yourrequeststextpos = (width/20, height*7/20)
 
 # Combat Menu
 infobox = pygame.Rect((width*11/20, 0), (width*9/20, height*49/100))
@@ -1141,8 +1149,10 @@ while run:
                 quitconfirm = True # Enable confirmation box
 
             # Username display
-            if username != None:
+            if username != None and connected:
                 textdisplay(f'User: {username}', (0, height-70*(width/960)), 70*(width/960))
+            else:
+                textdisplay('Not connected', (0, height - 70 * (width / 960)), 70 * (width / 960))
 
 
 
@@ -1224,6 +1234,9 @@ while run:
         # Background box and title
         pygame.draw.rect(screen, black, backgroundbox)
         screen.blit(friendsmenutitle, friendsmenutitlepos)
+
+        # Render friend high scores
+
 
         # Add friends button
         if addfriendsbutton.draw():
@@ -1638,6 +1651,15 @@ while run:
         # Background box and title
         pygame.draw.rect(screen, black, backgroundbox)
         screen.blit(addfriendsmenutitle, addfriendsmenutitlepos)
+
+        # Send friend request textbox
+        screen.blit(addfriendtext, addfriendtextpos)
+        if addfriendtextbox.draw() != None:
+            # Add friend code
+            pass
+
+        # Received friend requests
+        screen.blit(yourrequeststext, yourrequeststextpos)
 
         # Back button in bottom right
         if backbutton.draw():
