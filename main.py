@@ -1737,19 +1737,19 @@ while run:
         # User found text
         if requestuserfoundflag:
             screen.blit(requestuserfoundtext, requestuserfoundtextpos)
-            if datetime.now() - requestuserfoundnow > timedelta(milliseconds=1000):
+            if datetime.now() - requestuserfoundnow > timedelta(milliseconds=3000):
                 requestuserfoundflag = False
 
         # User not found text
         if requestusernotfoundflag:
             screen.blit(requestusernotfoundtext, requestusernotfoundtextpos)
-            if datetime.now() - requestusernotfoundnow > timedelta(milliseconds=1000):
+            if datetime.now() - requestusernotfoundnow > timedelta(milliseconds=3000):
                 requestusernotfoundflag = False
 
         # Request already sent text
         if requestalreadysentflag:
             screen.blit(requestalreadysenttext, requestalreadysenttextpos)
-            if datetime.now() - requestalreadysentnow > timedelta(milliseconds=1000):
+            if datetime.now() - requestalreadysentnow > timedelta(milliseconds=3000):
                 requestalreadysentflag = False
 
         # Received friend requests
