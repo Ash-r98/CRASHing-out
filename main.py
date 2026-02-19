@@ -968,6 +968,8 @@ requestusernotfoundtext = warningfont.render('User not found', True, red)
 requestusernotfoundtextpos = (width*11/20, height*3/10)
 requestuserfoundtext = warningfont.render('Request sent!', True, green)
 requestuserfoundtextpos = (width*11/20, height*3/10)
+requestalreadysenttext = warningfont.render('Request already sent', True, white)
+requestalreadysenttextpos = (width*9/20, height*3/10)
 
 # Combat Menu
 infobox = pygame.Rect((width*11/20, 0), (width*9/20, height*49/100))
@@ -1023,6 +1025,7 @@ cardrewardclaimed = False
 # Friends menu variables
 requestuserfoundflag = False
 requestusernotfoundflag = False
+requestalreadysentflag = False
 
 
 # Character backup variable
@@ -1048,6 +1051,7 @@ prevplayedcardnow = datetime.now()
 combatbackbuttonnow = datetime.now()
 requestuserfoundnow = datetime.now()
 requestusernotfoundnow = datetime.now()
+requestalreadysentnow = datetime.now()
 
 # Devmode variables
 toggledev = False
@@ -1710,16 +1714,22 @@ while run:
                     """, (username,))
                     selfid = cursor.fetchone()[0]
 
-                    requestlist.append(selfid)
-                    print(requestlist, requestid)
+                    # Validation
+                    if selfid not in requestlist:
+                        requestlist.append(selfid)
 
-                    # Update user's friend request list with new list
-                    cursor.execute("""
-                        UPDATE usertable
-                        SET receivedfriendrequests = %s
-                        WHERE id = %s
-                    """, (requestlist, requestid))
-                    con.commit()
+                        # Update user's friend request list with new list
+                        cursor.execute("""
+                            UPDATE usertable
+                            SET receivedfriendrequests = %s
+                            WHERE id = %s
+                        """, (requestlist, requestid))
+                        con.commit()
+
+                    else: # If user already sent a request
+                        requestuserfoundflag = False
+                        requestalreadysentflag = True
+                        requestalreadysentnow = datetime.now()
 
             except:
                 pass
@@ -1735,6 +1745,12 @@ while run:
             screen.blit(requestusernotfoundtext, requestusernotfoundtextpos)
             if datetime.now() - requestusernotfoundnow > timedelta(milliseconds=1000):
                 requestusernotfoundflag = False
+
+        # Request already sent text
+        if requestalreadysentflag:
+            screen.blit(requestalreadysenttext, requestalreadysenttextpos)
+            if datetime.now() - requestalreadysentnow > timedelta(milliseconds=1000):
+                requestalreadysentflag = False
 
         # Received friend requests
         screen.blit(yourrequeststext, yourrequeststextpos)
