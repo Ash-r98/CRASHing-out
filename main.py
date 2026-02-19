@@ -85,6 +85,11 @@ def textdisplay(text, pos, fontsize):
     testtext = tempfont.render(text, True, white)
     screen.blit(testtext, pos)
 
+def colourtextdisplay(text, pos, fontsize, colour):
+    tempfont = pygame.font.Font(fontname, int(fontsize))
+    testtext = tempfont.render(text, True, colour)
+    screen.blit(testtext, pos)
+
 # Object mouse hover detection
 def ishover(rect): # Takes a pygame rectangle object as a parameter
     # Get mouse position
@@ -201,7 +206,7 @@ def doublequicksort(comparelist, bonuslist): # Sorts both lists according to val
     bonuslower = []
     bonushigher = []
     for i in range(1, len(comparelist)):
-        if comparelist[i] < comparepivot:
+        if comparelist[i] > comparepivot:
             comparelower.append(comparelist[i])
             bonuslower.append(bonuslist[i])
         else:
@@ -1059,6 +1064,8 @@ initialloadfriends = True
 selffriendidlist = []
 selffriendnamelist = []
 friendhighscorelist = []
+namelist = []
+highscorelist = []
 initialloadrequests = True
 selfrequestidlist = []
 selfrequestnamelist = []
@@ -1339,7 +1346,15 @@ while run:
 
         # Render friend high scores
         if connected:
-            pass
+            if len(namelist) >= 1:
+                colourtextdisplay(f'1. {namelist[0]} - {highscorelist[0]}', (width/20, height*2/10), 60*width/960, gold)
+            if len(namelist) >= 2:
+                colourtextdisplay(f'2. {namelist[1]} - {highscorelist[1]}', (width/20, height*3/10), 55*width/960, silver)
+            if len(namelist) >= 3:
+                colourtextdisplay(f'3. {namelist[2]} - {highscorelist[2]}', (width/20, height*4/10), 50*width/960, bronze)
+            if len(namelist) >= 4:
+                for i in range(3, len(namelist)):
+                    textdisplay(f'{i+1}. {namelist[i]} - {highscorelist[i]}', (width/20, height*39/80+((i-3)*height/15)), 40*width/960)
 
 
         # Add friends button
