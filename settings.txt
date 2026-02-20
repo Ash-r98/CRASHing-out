@@ -2,4 +2,4 @@ width=960
 height=540
 volume=100
 hardmode=0
-autosynchighscore=0
+autosynchighscore=1
