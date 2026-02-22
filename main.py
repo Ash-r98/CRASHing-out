@@ -160,7 +160,7 @@ def displaycardpile(pile):
     if cardsonlastrow != 0:
         cardsperrow += 1
         cardsonlastrow = len(pile) % cardsperrow
-    scale = 1 / (rownum // 4 + 1)
+    scale = (width/960) / (rownum // 4 + 1)
 
     for i in range(rownum):
         y = (height / (rownum+1)) * (i + 1) - 80*scale
@@ -497,7 +497,8 @@ class Enemy:
         if datetime.now() - self.lastspritechange > timedelta(milliseconds=1000):
             self.currentspriteid = 0
         # Draw current sprite to screen
-        screen.blit(self.spritelist[self.currentspriteid], (width*5/16, height*3/16))
+        currentsprite = pygame.transform.scale(self.spritelist[self.currentspriteid],(100 * width / 960, 100 * height / 540))
+        screen.blit(currentsprite, (width*5/16, height*3/16))
 
     def takedamage(self, damage):
         if self.defence != 0:
@@ -677,7 +678,8 @@ class Player:
         if datetime.now() - self.lastspritechange > timedelta(milliseconds=1000):
             self.currentspriteid = 0
         # Draw current sprite to screen
-        screen.blit(self.spritelist[self.currentspriteid], (width*1/16, height*3/16))
+        currentsprite = pygame.transform.scale(self.spritelist[self.currentspriteid], (100 * width / 960, 100 * height / 540))
+        screen.blit(currentsprite, (width*1/16, height*3/16))
 
     def draw(self, amount):
         for i in range(amount):
@@ -1601,13 +1603,13 @@ while run:
         # Display next enemy move
         if enemymove != None:
             if enemymove[0] == 'attack':
-                screen.blit(swordsprite, (width*5/16, height*1/16))
+                screen.blit(pygame.transform.scale(swordsprite, (64 * width/960, 64 * height/540)), (width*5/16, height*1/16))
                 enemytextcolour = green
             elif enemymove[0] == 'defend':
-                screen.blit(shieldsprite, (width*5/16, height*1/16))
+                screen.blit(pygame.transform.scale(shieldsprite, (64 * width / 960, 64 * height / 540)), (width*5/16, height*1/16))
                 enemytextcolour = green
             elif enemymove[0] == 'specialattack':
-                screen.blit(swordspritered, (width * 5 / 16, height * 1 / 16))
+                screen.blit(pygame.transform.scale(swordspritered, (64 * width / 960, 64 * height / 540)), (width * 5 / 16, height * 1 / 16))
                 enemytextcolour = red
             # Always displays text number after displaying relevant sprite
             enemymovenumbertext = enemymovenumberfont.render(str(enemymove[1]), True, enemytextcolour)
