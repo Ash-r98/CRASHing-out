@@ -421,7 +421,7 @@ class CharacterButton:
     def selectdisplay(self):
         screen.blit(self.selectbackground, (0, 0))
         textdisplay(self.name, (0, 0), width/10)
-        textdisplay(self.description, (0, 100), width/30)
+        textdisplay(self.description, (0, height/6), width/30)
 
 
 # Card Class
@@ -1163,7 +1163,6 @@ while run:
 
                     else: # Username not found
                         hashpassword = hashlib.sha256(password.encode()).hexdigest()
-                        print(hashpassword)
                         cursor.execute("""
                             INSERT INTO usertable (username, password, highscore, friendslist, receivedfriendrequests) VALUES (%s, %s, %s, %s, %s)
                         """, (username, hashpassword, 0, [], []))
