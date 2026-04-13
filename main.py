@@ -871,7 +871,8 @@ enemydict = {
     'virus': ['Virus', 20, 6, 14, 6, False, 1, [], [whitesprite, whitesprite, whitesprite, whitesprite]],
     'trojan': ['Trojan', 40, 10, 20, 10, False, 2, ['disguise'], [whitesprite, whitesprite, whitesprite, whitesprite]],
     'indiegame': ['Indie Game', 65, 7, 12, 6, False, 3, [], [whitesprite, whitesprite, whitesprite, whitesprite]],
-    'encryption': ['Encryption Software', 50, 10, 18, 8, False, 2, [], [whitesprite, whitesprite, whitesprite, whitesprite]]
+    'encryption': ['Encryption Software', 50, 10, 18, 8, False, 2, [], [whitesprite, whitesprite, whitesprite, whitesprite]],
+    'server': ['Server', 100, 5, 8, 20, False, 3, [], [whitesprite, whitesprite, whitesprite, whitesprite]]
 }
 
 
